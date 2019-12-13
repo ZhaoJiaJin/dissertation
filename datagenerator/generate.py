@@ -60,7 +60,7 @@ def generateD(lvl):
             res[i][pos] = 1
     return res
 
-def neighDSqure(i,n):
+def neighDSquare(i,n):
     """ find all the points that have common neighours with i and the sum of common neighours
     Parameters
     ----------
@@ -108,8 +108,8 @@ def neighDSqure(i,n):
         res.append((idx,cnt))
     return res
 
-def generateDSqure(lvl):
-    """ compute D Squre
+def generateDSquare(lvl):
+    """ compute D Square
     let D^D = M
     then M(i,j) means how many common neighours do i and j have
     Parameters:
@@ -121,13 +121,14 @@ def generateDSqure(lvl):
     ori_size = 2**lvl
     res = np.zeros((size,size),dtype=int)
     for i in range(0,size):
-        for (neighid,neighvalue) in neighDSqure(i, ori_size):
+        for (neighid,neighvalue) in neighDSquare(i, ori_size):
             res[i][neighid] = neighvalue
     return res
 
 
 
 if __name__ == "__main__":
+    # compute D and D Square for power level from 1 to 8
     for lvl in range(1,8):
         print("lvl",lvl)
         begin = time.time()
@@ -137,13 +138,13 @@ if __name__ == "__main__":
         print("generate D, time cost(s):", end-begin)
 
         begin = time.time()
-        new_q = generateDSqure(lvl)
+        new_q = generateDSquare(lvl)
         end = time.time()
-        print("generate D Squre time cost using new method(s):", end-begin)
+        print("generate D Square time cost using new method(s):", end-begin)
 
         #begin = time.time()
         #np_q = res.dot(res)
         #end = time.time()
-        print("generate D Squre cost using numpy.dot(s):", end-begin)
+        print("generate D Square cost using numpy.dot(s):", end-begin)
 
-        #print("compare result of D Squres from different method:",(np_q==new_q).all())
+        #print("compare result of D Squares from different method:",(np_q==new_q).all())
