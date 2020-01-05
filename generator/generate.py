@@ -56,8 +56,11 @@ def generateD(lvl):
 
     for i in range(0, size):
         # fill all the neighbours of i
+        diag = 0
         for pos in findNeighbors(i,ori_size):
             res[i][pos] = 1
+            diag += 1
+        res[i][i] = diag
     return res
 
 def neighDSquare(i,n):
@@ -134,7 +137,7 @@ if __name__ == "__main__":
         begin = time.time()
         res = generateD(lvl)
         end = time.time()
-        #print("D:",res)
+        print("D:",res)
         print("generate D, time cost(s):", end-begin)
 
         begin = time.time()
@@ -145,6 +148,6 @@ if __name__ == "__main__":
         #begin = time.time()
         #np_q = res.dot(res)
         #end = time.time()
-        print("generate D Square cost using numpy.dot(s):", end-begin)
+        #print("generate D Square cost using numpy.dot(s):", end-begin)
 
         #print("compare result of D Squares from different method:",(np_q==new_q).all())
