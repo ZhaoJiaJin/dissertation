@@ -2,6 +2,7 @@
 
 import numpy as np
 from helper import generateD
+import time
 
 class StdSolu:
     def __init__(self,afile,tfile,m,n,lvl):
@@ -82,5 +83,13 @@ class StdSolu:
 
 
 if __name__ == "__main__":
-    s = StdSolu("a.csv","t.csv",2,3,4)
-    print(s.findSolution().shape)
+    with open("record","w") as f:
+        for i in range(3,5):
+            s = StdSolu("a.csv","t.csv",9,4,i)
+            begin = time.time()
+            print(i)
+            print(s.findSolution().shape)
+            end = time.time()
+            print("cost:",end - begin)
+            f.write("{0} {1}\n".format(i,end - begin))
+            f.flush()
