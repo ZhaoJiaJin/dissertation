@@ -60,7 +60,7 @@ def generateD(lvl):
         for pos in findNeighbors(i,ori_size):
             res[i][pos] = 1
             diag += 1
-        res[i][i] = diag
+        res[i][i] = -1*diag
     return res
 
 def neighDSquare(i,n):
