@@ -5,6 +5,7 @@
 because Q is very large can be represented using Kronecker product of P and D^2, so we wouldn't compute Q here
 """
 
+import math
 import numpy as np
 import time
 
@@ -13,34 +14,42 @@ R = "right"
 U = "up"
 D = "down"
 
-def findNeighbors(i,n):
+def findNeighbors(i,m,n):
     """find all the neighbours of i
     Parameters
     ----------
     i : int
         the index of the point that we need to find its neighbours
+    m : int
+        the number of rows of original matrix is n*n
     n : int
-        the shape of original matrix is n*n
+        the number of columns of original matrix is n*n
     """
 
     # all the neighours of i
     res = {
-            L:i-n,
-            R:i+n,
+            L:i-m,
+            R:i+m,
             U:i-1,
             D:i+1
             }
 
     # remove all the invalid neighbours
-    if i % n == 0:#the first row
+    if i % m == 0:#the first row
         res.pop(U)
     elif (i % n) == (n - 1):#the last row
         res.pop(D)
-    if i < n:# the first column
+    if i < m:# the first column
         res.pop(L)
-    elif i > n*n-1-n:# the last column
+    elif i > n*m-1-m:# the last column
         res.pop(R)
     return res.values()
+
+def mostSqure(v):
+    sqrt = int(math.sqrt(v))
+    for i in range(sqrt, 0, -1):
+        if v % i == 0:
+            return (i, v/i)
 
 
 def generateD(lvl):
@@ -50,14 +59,14 @@ def generateD(lvl):
     lvl : int
         Power Level
     """
-    size = 4**lvl
-    ori_size = 2**lvl
+    size = 4**lvl * 12
+    (m,n) = mostSqure(size)
     res = np.zeros((size,size),dtype=int)
 
     for i in range(0, size):
         # fill all the neighbours of i
         diag = 0
-        for pos in findNeighbors(i,ori_size):
+        for pos in findNeighbors(i,m,n):
             res[i][pos] = 1
             diag += 1
         res[i][i] = -1*diag

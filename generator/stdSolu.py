@@ -11,7 +11,7 @@ class StdSolu:
         self.num_m = m
         self.num_n = n
         self.num_lvl = lvl
-        self.num_N = 4**lvl
+        self.num_N = 4**lvl * 12
         self.A = None
         self.B = None
 
@@ -63,6 +63,7 @@ class StdSolu:
         # init all variable
         self.loadFromFile()
         D = self.getD()
+        print(D)
         Q = self.getQ()
 
         B = self.getB()
@@ -84,10 +85,10 @@ class StdSolu:
 
 if __name__ == "__main__":
     with open("record","w") as f:
-        for i in range(3,5):
+        for i in range(1,4):
             s = StdSolu("a.csv","t.csv",9,4,i)
             begin = time.time()
-            print(i)
+            print("level:",i)
             print(s.findSolution().shape)
             end = time.time()
             print("cost:",end - begin)
