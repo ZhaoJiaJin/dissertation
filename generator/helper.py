@@ -59,7 +59,7 @@ def generateD(lvl):
     lvl : int
         Power Level
     """
-    size = 4**lvl * 12
+    size = calNFromLvl(lvl)
     (m,n) = mostSqure(size)
     res = np.zeros((size,size),dtype=int)
 
@@ -72,6 +72,9 @@ def generateD(lvl):
         res[i][i] = -1*diag
     return res
 
+
+def calNFromLvl(lvl):
+    return 4**lvl*12
 
 if __name__ == "__main__":
     # compute D and D Square for power level from 1 to 8

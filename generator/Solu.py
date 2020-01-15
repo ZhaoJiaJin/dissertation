@@ -1,29 +1,28 @@
 #!/usr/bin/env python
 
 import numpy as np
-from helper import generateD
+from helper import generateD,calNFromLvl
 
 class Solution:
-    def __init__(self,afile,tfile,m,n,lvl):
+    def __init__(self,afile,tfile,m,n,lvl,y):
         self.af = afile
         self.tf = tfile
         self.num_m = m
         self.num_n = n
         self.num_lvl = lvl
-        self.num_N = 4**lvl * 12
+        self.num_N = calNFromLvl(lvl)
         self.A = None
         self.B = None
 
         self.D = None
         self.Q = None
         self.u = None
-        self.y = None
 
         self.T = None
         self.N = None
         self.C = None
 
-        self.y = None
+        self.y = y
         self.u = None
         self.N = np.eye(self.num_N)
         self.P = np.eye(self.num_n)
@@ -49,7 +48,6 @@ class Solution:
         self.T = np.zeros((self.num_m,self.num_m))
         for i in range(0,self.num_m):
             self.T[i,i] = T[i]
-        self.y = 5 * np.random.random_sample((self.num_m * self.num_N, 1))
 
     def getD(self):
         self.D = generateD(self.num_lvl)

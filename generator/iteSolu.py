@@ -15,8 +15,8 @@ def matvec_reshape(A,B,x,isASymm = False):
 
 
 class IteSolu(Solution):
-    def __init__(self,afile,tfile,m,n,lvl,toler):
-        super().__init__(afile,tfile,m,n,lvl)
+    def __init__(self,afile,tfile,m,n,lvl,y,toler):
+        super().__init__(afile,tfile,m,n,lvl,y)
         self.toler = toler
         self.b = None
         self.ATrans = np.transpose(self.A)
@@ -56,26 +56,32 @@ class IteSolu(Solution):
 
         r_k_norm = np.dot(r,r)
         origin_r_norm = r_k_norm
-        for i in range(2*n*2):
+        #for i in range(2*n*2):
+        i = 0
+        while True:
+            i+=1
             #rold = r
             q = self.calQx(p) + self.calBTCBx(p)
             alpha = r_k_norm / np.dot(p,q)
             x += alpha * p
-            r -= alpha * q
+            if i % 10 == 0:
+                r = b - self.calQx(x) - self.calBTCBx(x)
+            else:
+                r -= alpha * q
 
             r_k1_norm = np.dot(r,r)
             beta = r_k1_norm/r_k_norm
             r_k_norm = r_k1_norm
-            if r_k1_norm < 1e-10 * origin_r_norm:
-                print('Itr:', i)
+            #if r_k1_norm < 1e-10 * origin_r_norm:
+            if r_k1_norm < 1e-20:
+                newr = b - self.calQx(x) - self.calBTCBx(x)
+                newr_norm = np.dot(newr,newr)
+                print('Itr:', i, r_k1_norm,newr_norm)
                 break
             p = r + beta * p
         print(r_k_norm)
         return x
 
-if __name__ == "__main__":
-    s = IteSolu("a.csv","t.csv",9,4,1,0.1)
-    print(s.findSolution())
 
 
 
