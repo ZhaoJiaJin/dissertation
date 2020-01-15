@@ -39,9 +39,13 @@ class Solution:
 
 
     def loadFromFile(self):
-        A = np.loadtxt(open(self.af,"r"),delimiter=",")
+        f = open(self.af,"r")
+        A = np.loadtxt(f,delimiter=",")
+        f.close()
         self.A = A[:self.num_m, :self.num_n]
-        T = np.loadtxt(open(self.tf,"r"),delimiter=",")
+        f = open(self.tf,"r")
+        T = np.loadtxt(f,delimiter=",")
+        f.close()
         self.T = np.zeros((self.num_m,self.num_m))
         for i in range(0,self.num_m):
             self.T[i,i] = T[i]

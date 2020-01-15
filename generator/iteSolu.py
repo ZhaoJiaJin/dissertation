@@ -6,9 +6,6 @@ from Solu import Solution
 def matvec_reshape(A,B,x,isASymm = False):
     (rowa,cola) = A.shape
     (rowb,colb) = B.shape
-    print(A.shape)
-    print(B.shape)
-    print(x.shape)
     X = np.reshape(x, (colb,cola),order='F')
     if isASymm:
         Y = B.dot(X.dot(A))
@@ -58,7 +55,7 @@ class IteSolu(Solution):
         p = r
 
         r_k_norm = np.dot(r,r)
-        for i in range(2*n):
+        for i in range(2*n*2):
             #rold = r
             q = self.calQx(p) + self.calBTCBx(p)
             alpha = r_k_norm / np.dot(p,q)
@@ -68,10 +65,11 @@ class IteSolu(Solution):
             r_k1_norm = np.dot(r,r)
             beta = r_k1_norm/r_k_norm
             r_k_norm = r_k1_norm
-            if r_k1_norm < 1e-20:
+            if r_k1_norm < 1e-70:
                 print('Itr:', i)
                 break
             p = r + beta * p
+        print(r_k_norm)
         return x
 
 if __name__ == "__main__":

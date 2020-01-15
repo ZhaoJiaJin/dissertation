@@ -7,8 +7,8 @@ import numpy as np
 class TestSolution(unittest.TestCase):
 
     def test_IterateSolution(self):
-        m = 9
-        n = 4
+        m = 2
+        n = 2
         sourcefilea = "a.csv"
         sourcefilet = "t.csv"
 
@@ -27,6 +27,8 @@ class TestSolution(unittest.TestCase):
             end = time.time()
             print("iterate method took:{0}s".format(end - start))
 
+            for i in range(0, len(ite_x)):
+                print(ite_x[i], std_x[i])
             np.testing.assert_array_equal(ite_x,std_x)
 
 if __name__ == '__main__':

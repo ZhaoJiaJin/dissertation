@@ -10,7 +10,6 @@ class StdSolu(Solution):
 
     def findSolution(self):
         D = self.D
-        print(D)
         Q = self.getQ()
 
         B = self.getB()
@@ -26,7 +25,7 @@ class StdSolu(Solution):
         rightmost = BTransC.dot(y)
         leftmostInv = np.linalg.inv(leftmost)
         self.u = leftmostInv.dot(rightmost)
-        return self.u
+        return np.squeeze(self.u)
 
 
 
