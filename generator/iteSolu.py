@@ -20,6 +20,7 @@ class IteSolu(Solution):
         self.toler = toler
         self.b = None
         self.ATrans = np.transpose(self.A)
+        self.A_TTA = self.ATrans.dot(self.T.dot(self.A))
 
 
     def getb(self):
@@ -38,10 +39,7 @@ class IteSolu(Solution):
 
     def calBTCBx(self,x):
         X = np.reshape(x, (self.num_N, self.num_n), order='F')
-        X = X.dot(self.ATrans)
-        X = X.dot(self.T)
-        X = self.N.dot(X)
-        X = X.dot(self.A)
+        X = self.N.dot(X.dot(self.A_TTA))
         return np.reshape(X,(self.num_N * self.num_n),order='F')
 
     def findSolution(self):
