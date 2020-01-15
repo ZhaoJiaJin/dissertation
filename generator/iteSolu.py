@@ -55,6 +55,7 @@ class IteSolu(Solution):
         p = r
 
         r_k_norm = np.dot(r,r)
+        origin_r_norm = r_k_norm
         for i in range(2*n*2):
             #rold = r
             q = self.calQx(p) + self.calBTCBx(p)
@@ -65,7 +66,7 @@ class IteSolu(Solution):
             r_k1_norm = np.dot(r,r)
             beta = r_k1_norm/r_k_norm
             r_k_norm = r_k1_norm
-            if r_k1_norm < 1e-70:
+            if r_k1_norm < 1e-10 * origin_r_norm:
                 print('Itr:', i)
                 break
             p = r + beta * p
