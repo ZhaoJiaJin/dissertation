@@ -56,15 +56,12 @@ class IteSolu(Solution):
 
         r_k_norm = np.dot(r,r)
         origin_r_norm = r_k_norm
-        #for i in range(2*n*2):
-        i = 0
-        while True:
-            i+=1
+        for i in range(2*n):
             #rold = r
             q = self.calQx(p) + self.calBTCBx(p)
             alpha = r_k_norm / np.dot(p,q)
             x += alpha * p
-            if i % 10 == 0:
+            if i % 50 == 0:
                 r = b - self.calQx(x) - self.calBTCBx(x)
             else:
                 r -= alpha * q
@@ -73,13 +70,13 @@ class IteSolu(Solution):
             beta = r_k1_norm/r_k_norm
             r_k_norm = r_k1_norm
             #if r_k1_norm < 1e-10 * origin_r_norm:
-            if r_k1_norm < 1e-20:
-                newr = b - self.calQx(x) - self.calBTCBx(x)
-                newr_norm = np.dot(newr,newr)
-                print('Itr:', i, r_k1_norm,newr_norm)
+            if r_k1_norm < 1e-5:
+                #newr = b - self.calQx(x) - self.calBTCBx(x)
+                #newr_norm = np.dot(newr,newr)
+                #print('Itr:', i, r_k1_norm,newr_norm)
+                print('Itr:', i, r_k1_norm)
                 break
             p = r + beta * p
-        print(r_k_norm)
         return x
 
 
