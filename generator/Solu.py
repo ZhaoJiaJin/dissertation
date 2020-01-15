@@ -25,9 +25,18 @@ class Solution:
 
         self.y = None
         self.u = None
+        self.N = np.eye(self.num_N)
+        self.P = np.eye(self.num_n)
         # init all variable
         self.loadFromFile()
         self.getD()
+        self.DSqure = None
+
+    def getDSqure(self):
+        DSqure = self.D.dot(self.D)
+        self.DSqure = DSqure
+        return self.DSqure
+
 
     def loadFromFile(self):
         A = np.loadtxt(open(self.af,"r"),delimiter=",")
@@ -58,6 +67,6 @@ class Solution:
         return self.B
 
     def getC(self):
-        self.C = np.kron(self.T,np.eye(self.num_N))
+        self.C = np.kron(self.T,self.N)
         return self.C
 

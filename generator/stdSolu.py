@@ -32,7 +32,7 @@ class StdSolu(Solution):
 
 if __name__ == "__main__":
     with open("record","w") as f:
-        for i in range(1,4):
+        for i in range(1,2):
             s = StdSolu("a.csv","t.csv",9,4,i)
             begin = time.time()
             print("level:",i)
