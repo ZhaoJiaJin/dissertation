@@ -29,10 +29,11 @@ class IteSolu(Solution):
         res = np.zeros((self.num_N,col))
         for i in range(0,self.num_N):
             neighs = findNeighbors(i,self.Dsize[0],self.Dsize[1])
+            neighs_len = len(neighs)
             for j in range(0,col):
                 for idx in neighs:
                     res[i][j] += x[idx][j]
-                res[i][j] -= (len(neighs) * x[i][j])
+                res[i][j] -= (neighs_len* x[i][j])
         return res
 
     def getb(self):

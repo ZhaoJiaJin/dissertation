@@ -29,11 +29,9 @@ class TestHelperFunctions(unittest.TestCase):
         ite_s.getDSize()
 
         X = np.random.randint(0,10,(ite_s.num_N,ite_s.num_n))
-        print("X:",X)
         res = ite_s.DmulX(X)
 
         D = ite_s.getD()
-        print("D:",D)
         expect = D.dot(X)
         np.testing.assert_array_equal(res,expect,"wrong answer")
 
@@ -48,12 +46,10 @@ class TestHelperFunctions(unittest.TestCase):
         ite_s.getDSize()
 
         x = np.random.randint(0,10,(ite_s.num_N*ite_s.num_n))
-        print("x:",x)
         res = ite_s.calQx(x)
 
         ite_s.getD()
         Q = ite_s.getQ()
-        print("Q:",Q)
         expect = Q.dot(x)
         np.testing.assert_array_equal(res,expect,"wrong answer")
 
