@@ -9,7 +9,7 @@ class StdSolu(Solution):
         super().__init__(afile,tfile,m,n,lvl,y)
 
     def findSolution(self):
-        D = self.D
+        D = self.getD()
         Q = self.getQ()
 
         B = self.getB()

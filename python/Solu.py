@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
-from helper import generateD,calNFromLvl
+from helper import generateD,calNFromLvl,mostSqure
 
 class Solution:
     def __init__(self,afile,tfile,m,n,lvl,y):
@@ -26,16 +26,19 @@ class Solution:
         self.u = None
         self.N = np.eye(self.num_N)
         self.P = np.eye(self.num_n)
+        self.Dsize = None
         # init all variable
         self.loadFromFile()
-        self.getD()
-        self.DSqure = None
+        #self.DSqure = None
 
-    def getDSqure(self):
-        DSqure = self.D.dot(self.D)
-        self.DSqure = DSqure
-        return self.DSqure
+    #def getDSqure(self):
+    #    DSqure = self.D.dot(self.D)
+    #    self.DSqure = DSqure
+    #    return self.DSqure
 
+    def getDSize(self):
+        self.Dsize = mostSqure(self.num_N)
+        return self.Dsize
 
     def loadFromFile(self):
         f = open(self.af,"r")

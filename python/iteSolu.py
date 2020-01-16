@@ -2,6 +2,7 @@
 
 import numpy as np
 from Solu import Solution
+from helper import findNeighbors
 
 def matvec_reshape(A,B,x,isASymm = False):
     (rowa,cola) = A.shape
@@ -22,6 +23,17 @@ class IteSolu(Solution):
         self.ATrans = np.transpose(self.A)
         self.A_TTA = self.ATrans.dot(self.T.dot(self.A))
 
+    def DmulX(self, x):
+        # x can be a N*z matrix,z can be bigger than 1
+        (row,col) = x.shape
+        res = np.zeros((self.num_N,col))
+        for i in range(0,self.num_N):
+            neighs = findNeighbors(i,self.Dsize[0],self.Dsize[1])
+            for j in range(0,col):
+                for idx in neighs:
+                    res[i][j] += x[idx][j]
+                res[i][j] -= (len(neighs) * x[i][j])
+        return res
 
     def getb(self):
         Y = np.reshape(self.y,(self.num_N, self.num_m), order='F')
@@ -34,8 +46,12 @@ class IteSolu(Solution):
         return self.b
 
     def calQx(self, x):
-        #TODO: can be optmised using Algo. 1
-        return matvec_reshape(self.P, self.DSqure, x, True)
+        #return matvec_reshape(self.P, self.DSqure, x, True)
+        X = np.reshape(x, (self.num_N,self.num_n),order='F')
+        X = self.DmulX(X)
+        X = self.DmulX(X)
+        return np.reshape(X,(self.num_N*self.num_n),order='F')
+
 
     def calBTCBx(self,x):
         X = np.reshape(x, (self.num_N, self.num_n), order='F')
@@ -47,7 +63,8 @@ class IteSolu(Solution):
     def findSolution(self):
         # init b(Gx = b)
         b = self.getb()
-        self.getDSqure()
+        self.getDSize()
+        #self.getDSqure()
         n = len(b)
         x = np.ones(n)
 
