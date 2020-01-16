@@ -6,8 +6,8 @@ from helper import calNFromLvl
 import sys
 
 if __name__ == '__main__':
-    m = 2
-    n = 2
+    m = 9
+    n = 4
     sourcefilea = "a.csv"
     sourcefilet = "t.csv"
 

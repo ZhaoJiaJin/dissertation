@@ -40,7 +40,8 @@ class IteSolu(Solution):
         # b = reshape(NYTA)
         TA = self.T.dot(self.A)
         YTA = Y.dot(TA)
-        B = self.N.dot(YTA)
+        #B = self.N.dot(YTA)
+        B = YTA
 
         self.b = np.reshape(B,(self.num_n * self.num_N), order='F')
         return self.b

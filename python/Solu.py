@@ -24,7 +24,6 @@ class Solution:
 
         self.y = y
         self.u = None
-        self.N = np.eye(self.num_N)
         self.P = np.eye(self.num_n)
         self.Dsize = None
         # init all variable
@@ -72,6 +71,7 @@ class Solution:
         return self.B
 
     def getC(self):
+        self.N = np.eye(self.num_N)
         self.C = np.kron(self.T,self.N)
         return self.C
 
