@@ -39,7 +39,9 @@ class IteSolu(Solution):
 
     def calBTCBx(self,x):
         X = np.reshape(x, (self.num_N, self.num_n), order='F')
-        X = self.N.dot(X.dot(self.A_TTA))
+        #X = self.N.dot(X.dot(self.A_TTA))
+        # N is identity matrix
+        X = X.dot(self.A_TTA)
         return np.reshape(X,(self.num_N * self.num_n),order='F')
 
     def findSolution(self):

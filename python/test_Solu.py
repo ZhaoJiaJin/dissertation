@@ -14,7 +14,7 @@ class TestSolution(unittest.TestCase):
         sourcefilea = "a.csv"
         sourcefilet = "t.csv"
 
-        for i in range(1,10):
+        for i in range(1,4):
             print("-------------lvl:{0}, N:{1}------------".format(i, calNFromLvl(i)))
             y = 5 * np.random.randint(0,10,(m * calNFromLvl(i), 1))
             #iterate method
