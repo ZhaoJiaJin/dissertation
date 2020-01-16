@@ -10,13 +10,14 @@ if __name__ == '__main__':
     n = 4
     sourcefilea = "a.csv"
     sourcefilet = "t.csv"
+    tnum = 4
 
-    for i in range(1,8):
+    for i in range(1,5):
         print("-------------lvl:{0}, N:{1}------------".format(i, calNFromLvl(i)))
         y = 5 * np.random.randint(0,10,(m * calNFromLvl(i), 1))
         #iterate method
         start = time.time()
-        ite_s = IteSolu(sourcefilea,sourcefilet,m,n,i,y,0.001)
+        ite_s = IteSolu(sourcefilea,sourcefilet,m,n,i,y,0.001,tnum)
         ite_x = ite_s.findSolution()
         end = time.time()
         print("iterate method took:{0}s".format(end - start))

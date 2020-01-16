@@ -3,6 +3,7 @@
 import numpy as np
 from Solu import Solution
 from helper import findNeighbors
+import threading
 
 def matvec_reshape(A,B,x,isASymm = False):
     (rowa,cola) = A.shape
@@ -15,25 +16,50 @@ def matvec_reshape(A,B,x,isASymm = False):
     return np.reshape(Y,(rowa*rowb),order='F')
 
 
+class DThread(threading.Thread):
+    def __init__(self,tid,x,res,tsum,dsize):
+        threading.Thread.__init__(self)
+        self.x = x
+        self.res = res
+        (N,n) = x.shape
+        self.N = N
+        self.n = n
+        self.threadID = tid
+        self.tsum = tsum
+        self.Dsize = dsize
+        #print("new threadID:",self.threadID)
+    def run(self):
+        for i in range(self.threadID,self.N,self.tsum):
+            neighs = findNeighbors(i,self.Dsize[0],self.Dsize[1])
+            neighs_len = len(neighs)
+            for j in range(0,self.n):
+                for idx in neighs:
+                    self.res[i][j] += self.x[idx][j]
+                self.res[i][j] -= (neighs_len* self.x[i][j])
+
+
+
+
 class IteSolu(Solution):
-    def __init__(self,afile,tfile,m,n,lvl,y,toler):
+    def __init__(self,afile,tfile,m,n,lvl,y,toler,threadnum):
         super().__init__(afile,tfile,m,n,lvl,y)
         self.toler = toler
         self.b = None
         self.ATrans = np.transpose(self.A)
         self.A_TTA = self.ATrans.dot(self.T.dot(self.A))
+        self.threadnum = threadnum
 
     def DmulX(self, x):
         # x can be a N*z matrix,z can be bigger than 1
         (row,col) = x.shape
         res = np.zeros((self.num_N,col))
-        for i in range(0,self.num_N):
-            neighs = findNeighbors(i,self.Dsize[0],self.Dsize[1])
-            neighs_len = len(neighs)
-            for j in range(0,col):
-                for idx in neighs:
-                    res[i][j] += x[idx][j]
-                res[i][j] -= (neighs_len* x[i][j])
+        threads = []
+        for i in range(0,self.threadnum):
+            t = DThread(i, x, res, self.threadnum, self.Dsize)
+            t.start()
+            threads.append(t)
+        for th in threads:
+            th.join()
         return res
 
     def getb(self):
