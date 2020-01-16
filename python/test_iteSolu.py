@@ -24,8 +24,9 @@ class TestHelperFunctions(unittest.TestCase):
         sourcefilea = "a.csv"
         sourcefilet = "t.csv"
         lvl = 1
+        tnum = 2
         y = 5 * np.random.randint(0,10,(m * calNFromLvl(lvl), 1))
-        ite_s = IteSolu(sourcefilea,sourcefilet,m,n,lvl,y,0.001)
+        ite_s = IteSolu(sourcefilea,sourcefilet,m,n,lvl,y,0.001,tnum)
         ite_s.getDSize()
 
         X = np.random.randint(0,10,(ite_s.num_N,ite_s.num_n))
@@ -41,8 +42,9 @@ class TestHelperFunctions(unittest.TestCase):
         sourcefilea = "a.csv"
         sourcefilet = "t.csv"
         lvl = 1
+        tnum = 2
         y = 5 * np.random.randint(0,10,(m * calNFromLvl(lvl), 1))
-        ite_s = IteSolu(sourcefilea,sourcefilet,m,n,lvl,y,0.001)
+        ite_s = IteSolu(sourcefilea,sourcefilet,m,n,lvl,y,0.001, tnum)
         ite_s.getDSize()
 
         x = np.random.randint(0,10,(ite_s.num_N*ite_s.num_n))
