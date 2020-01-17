@@ -19,7 +19,7 @@ type IteSolu struct{
     AtTA mat.Matrix
 }
 
-func NewIteSolu(a,t mat.Matrix,m,n,bign int,y []float64, threadNum int)*IteSolu{
+func NewIteSolu(a,t mat.Matrix,m,n,bign,lvl int,y []float64, threadNum int)*IteSolu{
     res := new(IteSolu)
     res.A = a
     res.T = t
