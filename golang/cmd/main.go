@@ -33,7 +33,7 @@ func main(){
 
     bigN := utils.CalN(lvl)
     sizey := m * bigN
-    fmt.Printf("-----------lvl:%v, N:%v------------",lvl,sizey)
+    fmt.Printf("-----------lvl:%v, N:%v------------\n",lvl,sizey)
     y := make([]float64,sizey)
     for i := range y{
         y[i] = float64(rand.Intn(60))
