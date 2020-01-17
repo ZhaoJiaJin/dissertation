@@ -3,6 +3,7 @@ package solu
 import(
     "gonum.org/v1/gonum/mat"
     "conjugate/utils"
+    "fmt"
 )
 
 type IteSolu struct{
@@ -15,6 +16,7 @@ type IteSolu struct{
     srcx int
     srcy int
     threadNum int
+    AtTA mat.Matrix
 }
 
 func NewIteSolu(a,t mat.Matrix,m,n,bign int,y []float64, threadNum int)*IteSolu{
@@ -26,54 +28,89 @@ func NewIteSolu(a,t mat.Matrix,m,n,bign int,y []float64, threadNum int)*IteSolu{
     res.y = y
     res.srcx,res.srcy = utils.MostSqure(res.N)
     res.threadNum = threadNum
+
+    At := res.A.T()
+    var AtTA mat.Dense
+    AtTA.Product(At,res.T,res.A)
+    res.AtTA = &AtTA
     return res
 }
 
 
-func (this *IteSolu)DX(x []float64)[]float64{
+func (sl *IteSolu)DX(x []float64)[]float64{
     res := make([]float64, len(x))
     operator := &DXOpe{
         X:x,
         Res:res,
-        ThreadNum:this.threadNum,
-        Rowx:this.N,
-        Colx:this.n,
-        Srcx:this.srcx,
-        Srcy:this.srcy,
+        ThreadNum:sl.threadNum,
+        Rowx:sl.N,
+        Colx:sl.n,
+        Srcx:sl.srcx,
+        Srcy:sl.srcy,
     }
     operator.Calculate()
     return operator.Res
 }
 
-func (this *IteSolu)getQx(x []float64)mat.Matrix{
-    //res := x.RawMatrix().Data
-    res := x
-    //X = mat.NewDense(this.n, this.N,raw).T()
-    res = this.DX(res)
-    res = this.DX(res)
-    return mat.NewDense(len(res),1,res)
+func (sl *IteSolu)calQx(x *mat.VecDense)mat.Vector{
+    res := x.RawVector().Data
+    //res := x
+    //X = mat.NewDense(sl.n, sl.N,raw).T()
+    res = sl.DX(res)
+    res = sl.DX(res)
+    return mat.NewVecDense(len(res),res)
 }
 
-func (this *IteSolu)FindSolution()[]float64{
-    At := this.A.T()
-    var AtTA mat.Dense
-    AtTA.Product(At,this.T,this.A)
+func (sl *IteSolu)calBtCBx(x *mat.VecDense)mat.Vector{
+    Xt := mat.NewDense(sl.n,sl.N,x.RawVector().Data)
+    X := Xt.T()
+    res := new(mat.Dense)
+    res.Product(X, sl.AtTA)
+    return mat.DenseCopyOf(&VMatrix{res}).ColView(0)
+}
 
-    b := this.calb()
+func (sl *IteSolu)FindSolution()mat.Vector{
+    b := sl.calb()
 
     leng,_ := b.Dims()
-    //_ = mat.NewDense(leng, 1, nil)
-    _ = make([]float64,leng)
+    x := mat.NewVecDense(leng, nil)
 
-    //r = b - 
+    //x = make([]float64,leng)
+    r := vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
+    p := r
 
-    return []float64{}
+    r_k_norm := mat.Dot(r,r)
+    ori_norm := r_k_norm
+    q := new(mat.VecDense)
+    for i:=0; i<2*leng; i ++{
+        q.Reset()
+        q.AddVec(sl.calQx(p),sl.calBtCBx(p))
+        alpha := r_k_norm / mat.Dot(p,q)
+        x.AddScaledVec(x,alpha,p)
+        if i % 50 == 0{
+            r = vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
+        }else{
+            r.AddScaledVec(r, alpha*-1, q)
+        }
+
+        r_k1_norm := mat.Dot(r,r)
+        beta := r_k1_norm/r_k_norm
+        r_k_norm = r_k1_norm
+        if r_k1_norm < 1e-5{
+            fmt.Println("Itr:", i, r_k1_norm, ori_norm)
+            break
+        }
+        p.AddScaledVec(r,beta,p)
+
+    }
+    return x
 }
 
-func (this *IteSolu)calb()mat.Matrix{
-    Yt := mat.NewDense(this.m, this.N, this.y)
+func (sl *IteSolu)calb()mat.Vector{
+    Yt := mat.NewDense(sl.m, sl.N, sl.y)
     Y := Yt.T()
     var res mat.Dense
-    res.Product(Y, this.T, this.A)
-    return &VMatrix{&res}
+    res.Product(Y, sl.T, sl.A)
+    y := mat.DenseCopyOf(&VMatrix{&res})
+    return y.ColView(0)
 }

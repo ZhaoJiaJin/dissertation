@@ -62,3 +62,10 @@ func generateD(lvl int)*mat.Dense{
 
     return mat.NewDense(size,size, res)
 }
+
+func vectorsub(a,b,c mat.Vector)*mat.VecDense{
+    res := new(mat.VecDense)
+    res.SubVec(a,b)
+    res.SubVec(res,c)
+    return res
+}
