@@ -33,7 +33,7 @@ func main(){
 
     bigN := utils.CalN(lvl)
     sizey := m * bigN
-    fmt.Printf("-----------lvl:%v, N:%v------------\n",lvl,sizey)
+    fmt.Printf("-----------lvl:%v, N:%v------------\n",lvl,bigN)
     y := make([]float64,sizey)
     for i := range y{
         y[i] = float64(rand.Intn(60))
@@ -45,19 +45,19 @@ func main(){
     t := config.GetMatrixT(m)
     var resStd mat.Vector
     var resIte mat.Vector
-    if method == "std" || method == "both"{
-        begin := time.Now().Unix()
-        sl := solu.NewStdSolu(a,t,m,n,bigN,lvl,y)
-        resStd = sl.FindSolution()
-        end := time.Now().Unix()
-        fmt.Println("standard method time cost:",end - begin)
-    }
     if method == "ite" || method == "both"{
         begin := time.Now().Unix()
         sl := solu.NewIteSolu(a,t,m,n,bigN,lvl,y,threadNum)
         resIte = sl.FindSolution()
         end := time.Now().Unix()
         fmt.Println("iterate method time cost:",end - begin)
+    }
+    if method == "std" || method == "both"{
+        begin := time.Now().Unix()
+        sl := solu.NewStdSolu(a,t,m,n,bigN,lvl,y)
+        resStd = sl.FindSolution()
+        end := time.Now().Unix()
+        fmt.Println("standard method time cost:",end - begin)
     }
     if method == "both"{
         distance := new(mat.VecDense)
