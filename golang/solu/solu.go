@@ -4,6 +4,7 @@ import(
     "gonum.org/v1/gonum/mat"
     "conjugate/utils"
     "log"
+    "runtime"
 )
 
 type IteSolu struct{
@@ -57,7 +58,9 @@ func (sl *IteSolu)calQx(x *mat.VecDense)mat.Vector{
     //res := x
     //X = mat.NewDense(sl.n, sl.N,raw).T()
     res = sl.DX(res)
+    runtime.GC()
     res = sl.DX(res)
+    runtime.GC()
     return mat.NewVecDense(len(res),res)
 }
 
@@ -71,25 +74,29 @@ func (sl *IteSolu)calBtCBx(x *mat.VecDense)mat.Vector{
 
 func (sl *IteSolu)FindSolution()mat.Vector{
     b := sl.calb()
+    runtime.GC()
 
     leng,_ := b.Dims()
     x := mat.NewVecDense(leng, nil)
 
     //x = make([]float64,leng)
     r := vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
+    runtime.GC()
     p := r
 
     r_k_norm := mat.Dot(r,r)
     ori_norm := r_k_norm
     q := new(mat.VecDense)
-    for i:=0; i<2*leng; i ++{
+    for i:=1; i<2*leng; i ++{
         log.Println("Begin Itr:", i)
         q.Reset()
         q.AddVec(sl.calQx(p),sl.calBtCBx(p))
+        runtime.GC()
         alpha := r_k_norm / mat.Dot(p,q)
         x.AddScaledVec(x,alpha,p)
-        if i % 50 == 0{
+        if i % 5 == 0{
             r = vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
+            runtime.GC()
         }else{
             r.AddScaledVec(r, alpha*-1, q)
         }
@@ -98,7 +105,9 @@ func (sl *IteSolu)FindSolution()mat.Vector{
         beta := r_k1_norm/r_k_norm
         r_k_norm = r_k1_norm
         if r_k1_norm < 1e-5{
-            log.Println("Itr:", i, r_k1_norm, ori_norm)
+            r = vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
+            runtime.GC()
+            log.Println("Itr:", i, r_k1_norm, mat.Dot(r,r),ori_norm)
             break
         }
         p.AddScaledVec(r,beta,p)
