@@ -3,6 +3,8 @@ package solu
 import(
     "gonum.org/v1/gonum/mat"
     "conjugate/utils"
+    "sync"
+    "log"
 )
 
 const(
@@ -22,7 +24,25 @@ func GenerateI(n int)mat.Matrix{
     return mat.NewDiagDense(n,v)
 }
 
-func findNeighbors(i,m,n int)map[string]int{
+func findAllNeigh(m,n,N,threadNum int)[][]int{
+    log.Println("find all neighbours")
+    res := make([][]int,N)
+    var wg sync.WaitGroup
+    for i:=0; i < threadNum; i ++{
+        wg.Add(1)
+        go func(tid int){
+            defer wg.Done()
+            for idx := tid; idx < N; idx += threadNum{
+                res[idx] = findNeighbors(idx,m,n)
+            }
+        }(i)
+    }
+    wg.Wait()
+    log.Println("find all neighbours done")
+    return res
+}
+
+func findNeighbors(i,m,n int)[]int{
     res := map[string]int{
             L:i-m,
             R:i+m,
@@ -43,7 +63,13 @@ func findNeighbors(i,m,n int)map[string]int{
     if i > n*m-1-m{// the last column
         delete(res, R)
     }
-    return res
+    r := make([]int,len(res))
+    idx := 0
+    for _,v := range res{
+        r[idx] = v
+        idx ++
+    }
+    return r
 }
 
 

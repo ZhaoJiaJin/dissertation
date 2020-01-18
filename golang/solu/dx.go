@@ -12,6 +12,7 @@ type DXOpe struct{
     Colx int
     Srcx int
     Srcy int
+    AllNeigh [][]int
     wg sync.WaitGroup
 }
 
@@ -26,19 +27,27 @@ func (ope *DXOpe)Calculate(){
 func (ope *DXOpe)cal(tid int){
     defer ope.wg.Done()
     for i:=tid; i < ope.Rowx; i+=ope.ThreadNum{
-        neighs := findNeighbors(i,ope.Srcx,ope.Srcy)
+        //neighs := findNeighbors(i,ope.Srcx,ope.Srcy)
+        neighs := ope.AllNeigh[i]
         len_neighs := float64(len(neighs))
         for j := 0; j < ope.Colx; j ++{
             val := 0.0
+            colAtj := ope.getXCol(j)
             for _,idx := range neighs{
-                val += ope.getX(idx,j)
+                val += colAtj[idx]
             }
-            val -= (len_neighs * ope.getX(i,j))
+            val -= (len_neighs * colAtj[i])
             ope.setR(i,j,val)
         }
     }
 }
 
+
+
+func (ope *DXOpe)getXCol(j int)[]float64{
+    // x is N*n matrix
+    return ope.X[ope.Rowx*j:ope.Rowx*(j+1)]
+}
 
 func (ope *DXOpe)getX(i,j int)float64{
     // x is N*n matrix
