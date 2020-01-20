@@ -17,6 +17,7 @@ func randv()(float64){
 func TestCalb(t *testing.T){
     m := 9
     n := 4
+    lvl := 1
     N := 4*12
     avl := make([]float64, m*n)
     for i := range avl{
@@ -33,7 +34,7 @@ func TestCalb(t *testing.T){
     ma := mat.NewDense(m,n,avl)
     mt := mat.NewDense(m,m,tvl)
     my := mat.NewDense(m*N,1,yvl)
-    sl := NewIteSolu(ma,mt,m,n,N,yvl,5)
+    sl := NewIteSolu(ma,mt,m,n,N,lvl,yvl,5)
     b := sl.calb()
     if debug{
         fmt.Println("b")
@@ -78,7 +79,7 @@ func TestQx(t *testing.T){
         xvl[i] = randv()
     }
     x := mat.NewVecDense(n*N,xvl)
-    sl := NewIteSolu(ma,mt,m,n,N,yvl,3)
+    sl := NewIteSolu(ma,mt,m,n,N,lvl,yvl,3)
     res := sl.calQx(x)
 
     d := generateD(lvl)
@@ -123,7 +124,7 @@ func TestBtCBx(t *testing.T){
     for i := range xvl{
         xvl[i] = randv()
     }
-    sl := NewIteSolu(ma,mt,m,n,N,yvl,3)
+    sl := NewIteSolu(ma,mt,m,n,N,lvl,yvl,3)
     x := mat.NewVecDense(n*N,xvl)
     res := sl.calBtCBx(x)
 

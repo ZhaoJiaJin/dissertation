@@ -42,7 +42,8 @@ func NewIteSolu(a,t mat.Matrix,m,n,bign,lvl int,y []float64, threadNum int)*IteS
 
 
 func (sl *IteSolu)DX(x []float64)[]float64{
-    res := make([]float64, len(x))
+    //res := make([]float64, len(x))
+    res := pool.GetRawData(len(x))
     operator := &DXOpe{
         X:x,
         Res:res,
@@ -57,32 +58,36 @@ func (sl *IteSolu)DX(x []float64)[]float64{
     return operator.Res
 }
 
-func (sl *IteSolu)calQx(x *mat.VecDense)mat.Vector{
-    log.Println("begin Qx")
-    res := x.RawVector().Data
+func (sl *IteSolu)calQx(x *mat.VecDense)*mat.VecDense{
+    printlog("begin Qx")
+    xraw := x.RawVector().Data
     //res := x
     //X = mat.NewDense(sl.n, sl.N,raw).T()
-    res = sl.DX(res)
-    runtime.GC()
-    res = sl.DX(res)
-    runtime.GC()
-    ret := mat.NewVecDense(len(res),res)
-    log.Println("end Qx")
+    dx := sl.DX(xraw)
+    ddx := sl.DX(dx)
+    ret := mat.NewVecDense(len(ddx),ddx)
+    printlog("end Qx")
+    pool.PutRawData(dx)
     return ret
 }
 
-func (sl *IteSolu)calBtCBx(x *mat.VecDense)mat.Vector{
-    log.Println("begin BtCBx")
+func (sl *IteSolu)calBtCBx(x *mat.VecDense)*mat.VecDense{
+    printlog("begin BtCBx")
     Xt := mat.NewDense(sl.n,sl.N,x.RawVector().Data)
     X := Xt.T()
-    res := new(mat.Dense)
+    //res := new(mat.Dense)
+    res := pool.GetMatrix(sl.N,sl.n)
     res.Product(X, sl.AtTA)
-    ret := mat.DenseCopyOf(&VMatrix{res}).ColView(0)
-    log.Println("end BtCBx")
-    return ret
+    retmat := pool.GetMatrix(sl.N*sl.n,1)
+    //ret := mat.DenseCopyOf(&VMatrix{res}).ColView(0)
+    retmat.Copy(&VMatrix{res})
+    rawres := retmat.RawMatrix().Data
+    printlog("end BtCBx")
+    pool.PutMatrix(res)
+    return mat.NewVecDense(len(rawres),rawres)
 }
 
-func (sl *IteSolu)calAx(x *mat.VecDense)(v1 mat.Vector,v2 mat.Vector){
+func (sl *IteSolu)calAx(x *mat.VecDense)(v1 *mat.VecDense,v2 *mat.VecDense){
     var wg sync.WaitGroup
     wg.Add(1)
     go func(){
@@ -108,8 +113,9 @@ func (sl *IteSolu)FindSolution()mat.Vector{
     //x = make([]float64,leng)
     v1,v2 := sl.calAx(x)
     r := vectorsub(b, v1,v2)
-    runtime.GC()
-    p := r
+    pool.PutVector(v1)
+    pool.PutVector(v2)
+    p := mat.VecDenseCopyOf(r)
 
     r_k_norm := mat.Dot(r,r)
     //ori_norm := r_k_norm
@@ -117,25 +123,28 @@ func (sl *IteSolu)FindSolution()mat.Vector{
     for i:=1; i<2*leng; i ++{
         log.Println("Begin Itr:", i)
         q.Reset()
-        q.AddVec(sl.calAx(p))
-        runtime.GC()
+        q.ReuseAsVec(sl.n*sl.N)
+        v1,v2 = sl.calAx(p)
+        q.AddVec(v1,v2)
+        pool.PutVector(v1)
+        pool.PutVector(v2)
         alpha := r_k_norm / mat.Dot(p,q)
         x.AddScaledVec(x,alpha,p)
         //if i % 1 == 0{
             v1,v2 = sl.calAx(x)
+            pool.PutVector(r)
             r = vectorsub(b, v1,v2)
-            runtime.GC()
+            pool.PutVector(v1)
+            pool.PutVector(v2)
         //}else{
         //    r.AddScaledVec(r, alpha*-1, q)
         //}
-
         r_k1_norm := mat.Dot(r,r)
         log.Println("New R:",r_k1_norm)
         beta := r_k1_norm/r_k_norm
         r_k_norm = r_k1_norm
         if r_k1_norm < 1e-3{
             //r = vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
-            runtime.GC()
             //log.Println("Itr:", i, r_k1_norm, mat.Dot(r,r))
             log.Println("Itr:", i, r_k1_norm)
             break
@@ -152,6 +161,5 @@ func (sl *IteSolu)calb()mat.Vector{
     var res mat.Dense
     res.Product(Y, sl.T, sl.A)
     y := mat.DenseCopyOf(&VMatrix{&res})
-    //TODO: pool sl.y
     return y.ColView(0)
 }

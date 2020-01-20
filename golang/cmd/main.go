@@ -38,6 +38,7 @@ func main(){
     flag.StringVar(&memprofile,"mem", "", "write mem profile to `file`")
     flag.Parse()
 
+    rand.Seed(time.Now().Unix())
     bigN := utils.CalN(lvl)
     sizey := m * bigN
     log.Printf("-----------lvl:%v, N:%v------------\n",lvl,bigN)

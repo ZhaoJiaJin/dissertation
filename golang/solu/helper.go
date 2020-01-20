@@ -90,7 +90,8 @@ func generateD(lvl int)*mat.Dense{
 }
 
 func vectorsub(a,b,c mat.Vector)*mat.VecDense{
-    res := new(mat.VecDense)
+    //res := new(mat.VecDense)
+    res := pool.GetVector(a.Len())
     res.SubVec(a,b)
     res.SubVec(res,c)
     return res
