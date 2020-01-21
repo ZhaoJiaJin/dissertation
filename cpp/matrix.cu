@@ -1,5 +1,4 @@
 #include "matrix.h"
-#include <iostream.h>
 
 Matrix::Matrix(int x, int y){
     row = x;
@@ -7,21 +6,21 @@ Matrix::Matrix(int x, int y){
     cudaMallocManaged(&data, x*y*sizeof(float));
 }
 
-Matrix::~dev_array(){
-    cubaFree(x);
+Matrix::~Matrix(){
+    cudaFree(data);
 }
 
 float* Matrix::getdata(){
-    return x
+    return data;
 }
 
 void Matrix::print(){
     for (int i=0; i < row; i++) {
-        std::cout << "[";
+	std::cout << "[";
         for (int j=0; j < col; j ++){
-            std::cout << x[i*col+j] << " ";
+		std::cout << data[i*col+j] << " ";
         }
-        std::cout << "]" << endl;
+	std::cout << "]" << std::endl; 
     }
 }
 
