@@ -24,9 +24,9 @@ func GenerateI(n int)mat.Matrix{
     return mat.NewDiagDense(n,v)
 }
 
-func findAllNeigh(m,n,N,threadNum int)[][]int{
+func findAllNeigh(m,n,N,threadNum int)[][]uint32{
     log.Println("find all neighbours")
-    res := make([][]int,N)
+    res := make([][]uint32,N)
     var wg sync.WaitGroup
     for i:=0; i < threadNum; i ++{
         wg.Add(1)
@@ -42,7 +42,7 @@ func findAllNeigh(m,n,N,threadNum int)[][]int{
     return res
 }
 
-func findNeighbors(i,m,n int)[]int{
+func findNeighbors(i,m,n int)[]uint32{
     res := map[string]int{
             L:i-m,
             R:i+m,
@@ -63,10 +63,10 @@ func findNeighbors(i,m,n int)[]int{
     if i > n*m-1-m{// the last column
         delete(res, R)
     }
-    r := make([]int,len(res))
+    r := make([]uint32,len(res))
     idx := 0
     for _,v := range res{
-        r[idx] = v
+        r[idx] = uint32(v)
         idx ++
     }
     return r
@@ -81,7 +81,7 @@ func generateD(lvl int)*mat.Dense{
     for i:=0; i < size; i ++{
         allneig := findNeighbors(i,m,n)
         for _,pos := range allneig{
-            res[i*size + pos] = 1
+            res[i*size + int(pos)] = 1
         }
         res[i*size + i] = float64(-1*len(allneig))
     }

@@ -51,8 +51,8 @@ func main(){
 
     a := config.GetMatrixA(m,n)
     t := config.GetMatrixT(m)
-    var resStd mat.Vector
-    var resIte mat.Vector
+    var resStd *mat.VecDense
+    var resIte *mat.VecDense
     if cpuprofile != "" {
         f, err := os.Create(cpuprofile)
         if err != nil {
@@ -87,6 +87,7 @@ func main(){
         resIte = sl.FindSolution()
         end := time.Now().Unix()
         log.Println("iterate method time cost:",end - begin)
+        sl.CalRealR(resIte)
     }
     if method == "std" || method == "both"{
         begin := time.Now().Unix()

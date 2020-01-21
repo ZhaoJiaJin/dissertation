@@ -19,7 +19,8 @@ type IteSolu struct{
     srcy int
     threadNum int
     AtTA mat.Matrix
-    AllNeigh [][]int
+    AllNeigh [][]uint32
+    b mat.Vector
 }
 
 func NewIteSolu(a,t mat.Matrix,m,n,bign,lvl int,y []float64, threadNum int)*IteSolu{
@@ -103,8 +104,9 @@ func (sl *IteSolu)calAx(x *mat.VecDense)(v1 *mat.VecDense,v2 *mat.VecDense){
     return
 }
 
-func (sl *IteSolu)FindSolution()mat.Vector{
+func (sl *IteSolu)FindSolution()*mat.VecDense{
     b := sl.calb()
+    sl.b = b
     runtime.GC()
 
     leng,_ := b.Dims()
@@ -131,13 +133,13 @@ func (sl *IteSolu)FindSolution()mat.Vector{
         alpha := r_k_norm / mat.Dot(p,q)
         x.AddScaledVec(x,alpha,p)
         //if i % 1 == 0{
-            v1,v2 = sl.calAx(x)
-            pool.PutVector(r)
-            r = vectorsub(b, v1,v2)
-            pool.PutVector(v1)
-            pool.PutVector(v2)
+            //v1,v2 = sl.calAx(x)
+            //pool.PutVector(r)
+            //r = vectorsub(b, v1,v2)
+            //pool.PutVector(v1)
+            //pool.PutVector(v2)
         //}else{
-        //    r.AddScaledVec(r, alpha*-1, q)
+            r.AddScaledVec(r, alpha*-1, q)
         //}
         r_k1_norm := mat.Dot(r,r)
         log.Println("New R:",r_k1_norm)
@@ -153,6 +155,16 @@ func (sl *IteSolu)FindSolution()mat.Vector{
 
     }
     return x
+}
+
+func (sl *IteSolu) CalRealR(x *mat.VecDense){
+    v1,v2 := sl.calAx(x)
+    //pool.PutVector(r)
+    r := vectorsub(sl.b, v1,v2)
+    pool.PutVector(v1)
+    pool.PutVector(v2)
+    rNorm := mat.Dot(r,r)
+    log.Println("Real R:",rNorm)
 }
 
 func (sl *IteSolu)calb()mat.Vector{

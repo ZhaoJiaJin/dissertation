@@ -12,7 +12,7 @@ type DXOpe struct{
     Colx int
     Srcx int
     Srcy int
-    AllNeigh [][]int
+    AllNeigh [][]uint32
     wg sync.WaitGroup
 }
 
