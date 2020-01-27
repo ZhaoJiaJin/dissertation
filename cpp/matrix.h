@@ -5,24 +5,26 @@
 #include <vector>
 #include <iostream>
 
-template <class T>
 class Matrix
 {
 public:
   Matrix(int x, int y);
+  ~Matrix();
   void print();
-  std::vector<T> *getdata();
-  Matrix crop(int x, int y);
-  T get(int i, int j);
-  void set(int i, int j,T v);
-  void push_back(T v);
-  /*Matrix mul(Matrix v);
-  Matrix kronReshapeMul()
+  void crop(Matrix* newm);
+  float get(int i, int j);
+  void set(int i, int j,float v);
+  void set_by_idx(int i, float v);
+  //void push_back(float v);
+  int getrow();
+  int getcol();
+  float* get_data();
+  /*Matrix kronReshapeMul()
   // v shape has to be row*1
   float dot(Matrix v);*/
 
 private:
-  std::vector<T> data;
+  float* data;
   int row, col;
 };
 

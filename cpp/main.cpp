@@ -21,16 +21,18 @@ int main(int argc, char *argv[]){
     int level = atoi(level_c);
     int bign = calN(level);
     std::cout << "level is " << level << " N is " << bign << std::endl;
-    Matrix <float> a (originm,originn);
-    Matrix <float> t (originm,1);
+    Matrix origina (originm,originn);
+    Matrix origint (originm,1);
 
-    loadFromFile<float>(inputfa, &a);
-    loadFromFile<float>(inputta, &t);
+    loadFromFile(inputfa, &origina);
+    loadFromFile(inputta, &origint);
 
-    a.print();
-    t.print();
-    a = a.crop(m,n);
-    t = t.crop(m,1);
+    origina.print();
+    origint.print();
+    Matrix a(m,n);
+    Matrix t(m,1);
+    origina.crop(&a);
+    origint.crop(&t);
     //Matrix y = randomMatrix(m*bign,1);
     a.print();
     t.print();
