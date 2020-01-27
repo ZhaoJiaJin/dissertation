@@ -24,17 +24,21 @@ int main(int argc, char *argv[]){
     Matrix origina (originm,originn);
     Matrix origint (originm,1);
 
-    loadFromFile(inputfa, &origina);
-    loadFromFile(inputta, &origint);
+    loadFromFile(inputfa, origina);
+    loadFromFile(inputta, origint);
 
     origina.print();
     origint.print();
     Matrix a(m,n);
     Matrix t(m,1);
-    origina.crop(&a);
-    origint.crop(&t);
+    origina.crop(a);
+    origint.crop(t);
     //Matrix y = randomMatrix(m*bign,1);
     a.print();
     t.print();
+    Matrix res;
+    mul(a,t,res);
+    std::cout << "result" << std::endl;
+    res.print();
     return 0;
 }

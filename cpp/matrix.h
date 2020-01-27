@@ -9,9 +9,11 @@ class Matrix
 {
 public:
   Matrix(int x, int y);
+  Matrix();
   ~Matrix();
+  void alloc(int x, int y);
   void print();
-  void crop(Matrix* newm);
+  void crop(Matrix &newm);
   float get(int i, int j);
   void set(int i, int j,float v);
   void set_by_idx(int i, float v);
@@ -26,6 +28,7 @@ public:
 private:
   float* data;
   int row, col;
+
 };
 
 #endif

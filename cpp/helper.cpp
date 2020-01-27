@@ -17,18 +17,18 @@ int calN(int level){
 }
 
 
-int loadFromFile(std::string fname, Matrix *m){
+int loadFromFile(std::string fname, Matrix &m){
     std::ifstream infile(fname);
     int i = 0;
     float t = 0.0000000000000000000;
     while(infile >> t){
-        m->set_by_idx(i,t);
+        m.set_by_idx(i,t);
         i++;
     }
     return 0;
 }
 
-Matrix mul(Matrix a, Matrix b){
+void mul(Matrix &a, Matrix &b, Matrix &res){
     int rowa, rowb,cola, colb;
     rowa = a.getrow();
     rowb = b.getrow();
@@ -39,7 +39,22 @@ Matrix mul(Matrix a, Matrix b){
         throw "matrix do not match in matrix multiplication";
     }
 
-    Matrix res(rowa,colb);
+    res.alloc(rowa,colb);
 
-    return res;
+    matrix_mul(a.get_data(),b.get_data(), res.get_data(), rowa,cola,colb);
+}
+
+
+
+void matrix_mul(float *a, float *b, float *c, int m, int n, int p){
+    float tmp;
+    for(int x = 0; x < m; x ++){
+        for(int y = 0; y < p; y ++){
+            tmp = 0;
+            for(int t = 0; t < n; t++){
+                tmp += (a[x*n + t] * b[t*p+y]);
+            }
+            c[p*x + y] = tmp;
+        }
+    }
 }

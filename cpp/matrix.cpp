@@ -1,6 +1,13 @@
 #include "matrix.h"
 
 Matrix::Matrix(int x, int y){
+    alloc(x,y);
+}
+
+Matrix::Matrix(){
+}
+
+void Matrix::alloc(int x, int y){
     row = x;
     col = y;
     //TODO:
@@ -50,16 +57,16 @@ void Matrix::set_by_idx(int i,float v){
 
 
 
-void Matrix::crop(Matrix* newm){
+void Matrix::crop(Matrix &newm){
     int x,y;
-    x = newm->getrow();
-    y = newm->getcol();
+    x = newm.getrow();
+    y = newm.getcol();
     if ((x > row) || (y > col)){
         throw "x or y exceed matrix size!";
     }
     for (int i=0; i < x; i ++){
         for (int j = 0; j < y; j ++){
-            newm->set(i,j,get(i,j));
+            newm.set(i,j,get(i,j));
         }
     }
 }
