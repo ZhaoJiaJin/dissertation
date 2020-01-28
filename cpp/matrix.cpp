@@ -7,6 +7,13 @@ Matrix::Matrix(int x, int y){
 Matrix::Matrix(){
 }
 
+Matrix::Matrix(int x, bool is_iden){
+    identity = is_iden;
+    row = x;
+    col = x;
+}
+
+
 void Matrix::alloc(int x, int y){
     row = x;
     col = y;
@@ -23,12 +30,12 @@ Matrix::~Matrix(){
 void Matrix::print(){
     //std::cout << data[0] << std::endl;
     //return;
-    
+	std::cout << std::endl;
     std::cout << std::setiosflags(std::ios_base::showpoint);
     for (int i=0; i < row; i++) {
 	    std::cout << "[";
         for (int j=0; j < col; j ++){
-		    std::cout << data[i*col+j] << " ";
+		    std::cout << get(i,j) << " ";
         }
 	    std::cout << "]" << std::endl; 
     }
@@ -38,14 +45,14 @@ float Matrix::get(int i, int j){
     if ((i >= row) || (j >= col)){
         throw "x or y exceed matrix size!";
     }
-    return data[i*col + j];
+    return data[cal_idx(i,j,row,col)];
 }
 
 void Matrix::set(int i,int j,float v){
     if ((i >= row) || (j >= col)){
         throw "x or y exceed matrix size!";
     }
-    data[i*col+j] = v;
+    data[cal_idx(i,j,row,col)] = v;
 }
 
 void Matrix::set_by_idx(int i,float v){
@@ -98,4 +105,8 @@ void Matrix::t(Matrix& t){
         }
     }
     return;
+}
+
+bool Matrix::is_identity(){
+    return identity;
 }

@@ -1,4 +1,5 @@
 #include "matrix.h"
+#include "matrixcal.h"
 #include "helper.h"
 #include <string>
 
@@ -33,7 +34,10 @@ int main(int argc, char *argv[]){
     Matrix t(m,m);
     origina.crop(a);
     origint.crop(t);
-    Matrix y = randomMatrix(m*bign,1);
+    randomMatrix(a);
+    randomMatrix(t);
+    Matrix y(m*bign,1);
+    randomMatrix(y);
     a.print();
     t.print();
     Matrix res;

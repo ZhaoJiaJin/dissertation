@@ -4,12 +4,18 @@
 #include <iomanip>
 #include <vector>
 #include <iostream>
+#include "helper.h"
 
+/*
+ * due to how kronecker and reshape works, 
+ * we use column-first layout in our data array to represent our matrix
+ */
 class Matrix
 {
 public:
   Matrix(int x, int y);
   Matrix();
+  Matrix(int c, bool is_iden);
   ~Matrix();
   void alloc(int x, int y);
   void print();
@@ -23,6 +29,7 @@ public:
   int getcol();
   float* get_data();
   void t(Matrix& t);
+  bool is_identity();
   /*Matrix kronReshapeMul()
   // v shape has to be row*1
   float dot(Matrix v);*/
@@ -30,6 +37,7 @@ public:
 private:
   float* data;
   int row, col;
+  bool identity;
 
 };
 
