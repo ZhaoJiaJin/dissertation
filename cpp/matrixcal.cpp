@@ -3,7 +3,7 @@
 void randomMatrix(Matrix &m){
     for (int i = 0; i < m.getrow(); i ++){
         for (int j = 0; j < m.getcol(); j ++){
-            m.set(i,j,rand() % 1000);
+            m.set(i,j,rand() % 10);
         }
     }
 }
@@ -61,21 +61,59 @@ void mul_kernel(float *a, float *b, float *c, int m, int n, int p){
     }
 }
 
-void kron_mul(Matrix &left, Matrix &middle, Matrix &right, Matrix &res){
-    if(middle.getcol() != 1){
+/*
+ * kron_mul perform reshape and kronecker product, the caller should perform transpose of the left matrix by itself.
+ */
+void kron_mul(Matrix &ma, Matrix &mb, Matrix &mx, Matrix &res){
+    if(mx.getcol() != 1){
         throw "the middle matrix should have one column when performing kronecker reshape product";
     }
-    int leftx,lefty,middlex,rightx,righty;
-    leftx = left.getrow();
-    lefty = left.getcol();
-    middlex = middle.getrow();
-    rightx = left.getrow();
-    righty = left.getcol();
+    int bcol, xrow, arow; 
+    arow = ma.getrow();
+    xrow = mx.getrow();
+    bcol = mb.getcol();
 
-    if (lefty * rightx != middlex){
+    if (arow * bcol != xrow){
         throw "the matrix sizes do not match when performing kronecker reshape product";
     }
-    res.alloc(leftx, righty);
+    //res.alloc(leftx, righty);
     
-    
+    if (mx.resize(bcol,arow) != 0){
+        throw "matrix resize failed";
+    }
+    Matrix tmpres;
+    //if (mb.is_identity()){
+    //    tmpres = mx;
+    //}else{
+        mul(mb,mx,tmpres);
+    //}
+
+    //if (ma.is_identity()){
+    //    res = tmpres;
+    //}else{
+        mul(tmpres, ma, res);
+    //}
+
+    res.resize(xrow,1);
+    return;
+}
+
+void kron_prod(Matrix &a, Matrix &b, Matrix &res){
+    int arow,acol, brow,bcol;
+    arow = a.getrow();
+    acol = a.getcol();
+    brow = b.getrow();
+    bcol = b.getcol();
+
+    res.alloc(arow*brow, acol*bcol);
+
+    for(int outi = 0; outi < arow; outi ++){
+        for(int outj = 0; outj < acol; outj ++){
+            for(int inneri = 0; inneri < brow; inneri ++){
+                for(int innerj = 0; innerj < bcol; innerj ++){
+                    res.set(outi * brow+inneri, outj*bcol + innerj, a.get(outi,outj) * b.get(inneri,innerj));
+                }
+            }
+        }
+    }
 }

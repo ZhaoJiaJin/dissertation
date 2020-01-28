@@ -30,6 +30,7 @@ public:
   float* get_data();
   void t(Matrix& t);
   bool is_identity();
+  int resize(int newr,int newc);
   /*Matrix kronReshapeMul()
   // v shape has to be row*1
   float dot(Matrix v);*/

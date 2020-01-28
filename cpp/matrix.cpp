@@ -2,9 +2,11 @@
 
 Matrix::Matrix(int x, int y){
     alloc(x,y);
+    identity = false;
 }
 
 Matrix::Matrix(){
+    identity = false;
 }
 
 Matrix::Matrix(int x, bool is_iden){
@@ -45,6 +47,13 @@ float Matrix::get(int i, int j){
     if ((i >= row) || (j >= col)){
         throw "x or y exceed matrix size!";
     }
+    if (is_identity()){
+        if (i == j){
+            return 1;
+        }else{
+            return 0;
+        }
+    }
     return data[cal_idx(i,j,row,col)];
 }
 
@@ -52,12 +61,18 @@ void Matrix::set(int i,int j,float v){
     if ((i >= row) || (j >= col)){
         throw "x or y exceed matrix size!";
     }
+    if (is_identity()){
+        throw "identity matrix do not support set method";
+    }
     data[cal_idx(i,j,row,col)] = v;
 }
 
 void Matrix::set_by_idx(int i,float v){
     if (i >= row*col){
         throw "x or y exceed matrix size!";
+    }
+    if (is_identity()){
+        throw "identity matrix do not support set method";
     }
     data[i] = v;
 }
@@ -90,6 +105,18 @@ int Matrix::getcol(){
 }
 
 float* Matrix::get_data(){
+    if (is_identity()){
+        alloc(row,col);
+        for(int i = 0; i < row; i ++){
+            for (int j = 0; j < col; j ++){
+                if (i == j){
+                    data[cal_idx(i,j,row,col)] = 1;
+                }else{
+                    data[cal_idx(i,j,row,col)] = 0;
+                }
+            }
+        }
+    }
     return data;
 }
 
@@ -109,4 +136,16 @@ void Matrix::t(Matrix& t){
 
 bool Matrix::is_identity(){
     return identity;
+}
+
+int Matrix::resize(int newr, int newc){
+    if (newr * newc != row * col){
+        return -1;
+    }
+    if (is_identity()){
+        throw "identity matrix do not support resize method";
+    }
+    row = newr;
+    col = newc;
+    return 0;
 }

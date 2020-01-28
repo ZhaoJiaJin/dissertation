@@ -12,8 +12,8 @@ int main(int argc, char *argv[]){
     std::string inputta = "t.csv";
     const int originm = 9;
     const int  originn = 4;
-    int m = 2;
-    int n = 2;
+    int m = 3;
+    int n = 3;
 
     char* method = argv[1];
     char* level_c = argv[2];
@@ -30,22 +30,36 @@ int main(int argc, char *argv[]){
 
     origina.print();
     origint.print();
-    Matrix a(m,n);
+    /*Matrix a(m,n);
     Matrix t(m,m);
     origina.crop(a);
     origint.crop(t);
-    randomMatrix(a);
-    randomMatrix(t);
+
     Matrix y(m*bign,1);
-    randomMatrix(y);
+    randomMatrix(y);*/
+
+    Matrix t(3,true);
+    Matrix a(m,n);
+    //Matrix t(m,m);
+    randomMatrix(a);
+    //randomMatrix(t);
     a.print();
     t.print();
+    Matrix kres;
+    kron_prod(a,t,kres);
+    //std::cout << "result" << std::endl;
+
+
+    Matrix y(9,1);
+    randomMatrix(y);
     Matrix res;
-    mul(a,t,res);
-    std::cout << "result" << std::endl;
+    mul(kres,y,res);
     res.print();
-    Matrix rest;
-    res.t(rest);
-    rest.print();
+
+    Matrix at;
+    a.t(at);
+    Matrix newres;
+    kron_mul(at, t, y,newres);
+    newres.print();
     return 0;
 }
