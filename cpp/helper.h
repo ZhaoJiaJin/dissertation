@@ -6,7 +6,8 @@
 #include <cmath>
 #include "matrix.h"
 
-int loadFromFile(std::string fname, Matrix &m);
+int load_from_file(std::string fname, Matrix &m);
+int load_diagonal(std::string fname, Matrix &m);
 Matrix randomMatrix(int row, int col);
 int calN(int level);
 

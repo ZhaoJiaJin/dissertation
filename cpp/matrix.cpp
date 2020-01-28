@@ -55,6 +55,9 @@ void Matrix::set_by_idx(int i,float v){
     data[i] = v;
 }
 
+void Matrix::set_diagonal(int i, float v){
+    set(i,i,v);
+}
 
 
 void Matrix::crop(Matrix &newm){

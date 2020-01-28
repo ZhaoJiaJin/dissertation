@@ -22,15 +22,15 @@ int main(int argc, char *argv[]){
     int bign = calN(level);
     std::cout << "level is " << level << " N is " << bign << std::endl;
     Matrix origina (originm,originn);
-    Matrix origint (originm,1);
+    Matrix origint (originm,originm);
 
-    loadFromFile(inputfa, origina);
-    loadFromFile(inputta, origint);
+    load_from_file(inputfa, origina);
+    load_diagonal(inputta, origint);
 
     origina.print();
     origint.print();
     Matrix a(m,n);
-    Matrix t(m,1);
+    Matrix t(m,m);
     origina.crop(a);
     origint.crop(t);
     Matrix y = randomMatrix(m*bign,1);
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]){
     std::cout << "result" << std::endl;
     res.print();
     Matrix rest;
-    a.t(rest);
+    res.t(rest);
     rest.print();
     return 0;
 }

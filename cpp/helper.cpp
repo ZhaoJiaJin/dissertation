@@ -17,7 +17,7 @@ int calN(int level){
 }
 
 
-int loadFromFile(std::string fname, Matrix &m){
+int load_from_file(std::string fname, Matrix &m){
     std::ifstream infile(fname);
     int i = 0;
     float t = 0.0000000000000000000;
@@ -26,6 +26,18 @@ int loadFromFile(std::string fname, Matrix &m){
         i++;
     }
     return 0;
+}
+
+int load_diagonal(std::string fname, Matrix &m){
+    std::ifstream infile(fname);
+    int i = 0;
+    float t = 0.0000000000000000000;
+    while(infile >> t){
+        m.set_diagonal(i,t);
+        i++;
+    }
+    return 0;
+
 }
 
 void mul(Matrix &a, Matrix &b, Matrix &res){

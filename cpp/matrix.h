@@ -17,6 +17,7 @@ public:
   float get(int i, int j);
   void set(int i, int j,float v);
   void set_by_idx(int i, float v);
+  void set_diagonal(int i, float v);
   //void push_back(float v);
   int getrow();
   int getcol();
