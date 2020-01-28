@@ -82,17 +82,17 @@ void kron_mul(Matrix &ma, Matrix &mb, Matrix &mx, Matrix &res){
         throw "matrix resize failed";
     }
     Matrix tmpres;
-    //if (mb.is_identity()){
-    //    tmpres = mx;
-    //}else{
-        mul(mb,mx,tmpres);
-    //}
+    if (mb.is_identity()){
+        tmpres = mx;
+    }else{
+      mul(mb,mx,tmpres);
+    }
 
-    //if (ma.is_identity()){
-    //    res = tmpres;
-    //}else{
-        mul(tmpres, ma, res);
-    //}
+    if (ma.is_identity()){
+        res = tmpres;
+    }else{
+      mul(tmpres, ma, res);
+    }
 
     res.resize(xrow,1);
     return;

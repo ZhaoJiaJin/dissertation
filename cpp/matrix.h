@@ -2,8 +2,8 @@
 #define _MATRIX_H
 
 #include <iomanip>
-#include <vector>
 #include <iostream>
+#include <algorithm>
 #include "helper.h"
 
 /*
@@ -17,6 +17,9 @@ public:
   Matrix();
   Matrix(int c, bool is_iden);
   ~Matrix();
+
+  Matrix(const Matrix& other);
+  Matirx& operator=(const Matrix& other);
   void alloc(int x, int y);
   void print();
   void crop(Matrix &newm);

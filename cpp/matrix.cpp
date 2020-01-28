@@ -13,6 +13,7 @@ Matrix::Matrix(int x, bool is_iden){
     identity = is_iden;
     row = x;
     col = x;
+    data = nullptr;
 }
 
 
@@ -24,9 +25,33 @@ void Matrix::alloc(int x, int y){
     data = new float[x*y];
 }
 
-
 Matrix::~Matrix(){
     delete[] data;   
+}
+
+
+Matrix::Matrix(const Matrix& other){
+	identify = other.is_identity();
+	row = other.getrow();
+	col = other.getcol();
+
+	data = new float[row*col];
+	otherdata = other.get_data();
+	std::copy(std::begin(otherdata), std::end(otherdata), std::begin(data));
+}
+
+
+Matirx& operator=(const Matrix& other){
+	if(&other != this){
+		delete[] data;
+		data = nullptr;
+		data = new float[row*col];
+		std::copy( std::begin(other.data), std::end(other.data), std::begin(data));
+		row = other.getrow();
+		col = other.getcol();
+		is_iden
+	}
+	return *this;
 }
 
 void Matrix::print(){
@@ -105,7 +130,7 @@ int Matrix::getcol(){
 }
 
 float* Matrix::get_data(){
-    if (is_identity()){
+    if (is_identity() && (data == nullptr)){
         alloc(row,col);
         for(int i = 0; i < row; i ++){
             for (int j = 0; j < col; j ++){
