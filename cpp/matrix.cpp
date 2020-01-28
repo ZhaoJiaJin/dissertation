@@ -84,3 +84,15 @@ float* Matrix::get_data(){
 }
 
 
+void Matrix::t(Matrix& t){
+    int ox,oy;
+    ox = getrow();
+    oy = getcol();
+    t.alloc(oy,ox);
+    for(int i = 0; i < ox; i ++){
+        for (int j = 0; j < oy; j ++){
+            t.set(j,i, get(i,j));
+        }
+    }
+    return;
+}

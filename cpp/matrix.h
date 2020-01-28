@@ -21,6 +21,7 @@ public:
   int getrow();
   int getcol();
   float* get_data();
+  void t(Matrix& t);
   /*Matrix kronReshapeMul()
   // v shape has to be row*1
   float dot(Matrix v);*/

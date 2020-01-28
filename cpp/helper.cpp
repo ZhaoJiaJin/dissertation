@@ -58,3 +58,14 @@ void matrix_mul(float *a, float *b, float *c, int m, int n, int p){
         }
     }
 }
+
+void most_square(int v, int& orix, int& oriy){
+    int begin = (int)sqrt(v);
+    for (int i = begin; i >= 1; i --){
+        if (v % i == 0){
+            orix = i;
+            oriy = v/i;
+        }
+    }
+    return;
+}

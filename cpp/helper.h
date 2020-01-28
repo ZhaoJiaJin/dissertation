@@ -13,5 +13,7 @@ int calN(int level);
 void mul(Matrix &a, Matrix &b, Matrix &res);
 void matrix_mul(float *a, float *b, float *c, int m, int n, int p);
 
+void most_square(int N, int& orix, int&oriy);
+
 
 #endif
