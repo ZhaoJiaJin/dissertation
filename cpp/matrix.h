@@ -18,8 +18,8 @@ public:
   Matrix(int c, bool is_iden);
   ~Matrix();
 
-  Matrix(const Matrix& other);
-  Matirx& operator=(const Matrix& other);
+  //Matrix(const Matrix& other);
+  //Matirx& operator=(const Matrix& other);
   void alloc(int x, int y);
   void print();
   void crop(Matrix &newm);
@@ -34,6 +34,7 @@ public:
   void t(Matrix& t);
   bool is_identity();
   int resize(int newr,int newc);
+  void copy(Matrix& other);
   /*Matrix kronReshapeMul()
   // v shape has to be row*1
   float dot(Matrix v);*/

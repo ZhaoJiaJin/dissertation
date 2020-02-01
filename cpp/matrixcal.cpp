@@ -83,15 +83,15 @@ void kron_mul(Matrix &ma, Matrix &mb, Matrix &mx, Matrix &res){
     }
     Matrix tmpres;
     if (mb.is_identity()){
-        tmpres = mx;
+        tmpres.copy(mx);
     }else{
-      mul(mb,mx,tmpres);
+        mul(mb,mx,tmpres);
     }
 
     if (ma.is_identity()){
-        res = tmpres;
+        res.copy(tmpres);
     }else{
-      mul(tmpres, ma, res);
+        mul(tmpres, ma, res);
     }
 
     res.resize(xrow,1);

@@ -29,7 +29,7 @@ Matrix::~Matrix(){
     delete[] data;   
 }
 
-
+/*
 Matrix::Matrix(const Matrix& other){
 	identify = other.is_identity();
 	row = other.getrow();
@@ -52,7 +52,7 @@ Matirx& operator=(const Matrix& other){
 		is_iden
 	}
 	return *this;
-}
+}*/
 
 void Matrix::print(){
     //std::cout << data[0] << std::endl;
@@ -173,4 +173,17 @@ int Matrix::resize(int newr, int newc){
     row = newr;
     col = newc;
     return 0;
+}
+
+void Matrix::copy(Matrix& other){
+	row = other.getrow();
+	col = other.getcol();
+
+    //TODO: change copy method
+	data = new float[row*col];
+	float* otherdata = other.get_data();
+    for (int i = 0; i < row*col; i ++){
+        data[i] = otherdata[i];
+    }
+    return;
 }
