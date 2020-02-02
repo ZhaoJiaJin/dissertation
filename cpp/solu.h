@@ -3,17 +3,18 @@
 
 #include "matrix.h"
 #include "helper.h"
+#include "matrixcal.h"
 
 class Solu
 {
 public:
-    Solu(Matrix &a_, Matrix &t_,Matrix y_, int m_, int n_, int bign_);
-    float solve(Matrix &res);
+    Solu(Matrix *a_, Matrix *t_,Matrix *y_, int m_, int n_, int bign_);
+    float solve();
 
 private:
-    Matrix a;
-    Matrix t;
-    Matrix y;
+    Matrix *a;
+    Matrix *t;
+    Matrix *y;
     int m;
     int n;
     int bign;
@@ -21,9 +22,12 @@ private:
     int srcy;
     Matrix AtTA;
     Matrix b;
+    Matrix answer;
 
     void init();
-    void solveb();
+    void calb();
+    void calQx(Matrix &x, Matrix &res);
+    void calBtCBX(Matrix &x, Matrix &res);
 };
 
 

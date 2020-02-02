@@ -1,13 +1,20 @@
 #include "matrix.h"
 #include "matrixcal.h"
 #include "helper.h"
+#include "solu.h"
 #include <string>
+
+#include <stdio.h> 
+#include <stdlib.h>
+#include <time.h> 
 
 int main(int argc, char *argv[]){
     if (argc != 3){
         std::cout << "please provide method and level" << std::endl;
         return 1;
     }
+    srand (time(NULL));
+
     std::string inputfa = "a.csv";
     std::string inputta = "t.csv";
     const int originm = 9;
@@ -28,18 +35,19 @@ int main(int argc, char *argv[]){
     load_from_file(inputfa, origina);
     load_diagonal(inputta, origint);
 
-    origina.print();
-    origint.print();
-    /*Matrix a(m,n);
+    Matrix a(m,n);
     Matrix t(m,m);
     origina.crop(a);
     origint.crop(t);
 
     Matrix y(m*bign,1);
-    randomMatrix(y);*/
+    randomMatrix(y);
 
-    Matrix t(3,true);
-    Matrix a(m,n);
+    Solu sl(&a,&t,&y,m,n,bign);
+
+    sl.solve();
+    //Matrix nnt(3,true);
+    /*Matrix a(m,n);
     //Matrix t(m,m);
     randomMatrix(a);
     //randomMatrix(t);
@@ -60,6 +68,6 @@ int main(int argc, char *argv[]){
     a.t(at);
     Matrix newres;
     kron_mul(at, t, y,newres);
-    newres.print();
+    newres.print();*/
     return 0;
 }

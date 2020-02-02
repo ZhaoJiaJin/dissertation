@@ -1,12 +1,14 @@
 #include "matrix.h"
 
 Matrix::Matrix(int x, int y){
+    data = nullptr;
     alloc(x,y);
     identity = false;
 }
 
 Matrix::Matrix(){
     identity = false;
+    data = nullptr;
 }
 
 Matrix::Matrix(int x, bool is_iden){
@@ -23,10 +25,13 @@ void Matrix::alloc(int x, int y){
     //TODO:
     //cudaMallocManaged(&data, x*y*sizeof(float));
     data = new float[x*y];
+    memset(data,0,x*y);
 }
 
 Matrix::~Matrix(){
-    delete[] data;   
+    if (data != nullptr){
+        delete[] data;   
+    }
 }
 
 /*

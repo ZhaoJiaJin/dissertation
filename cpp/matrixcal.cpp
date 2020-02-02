@@ -117,3 +117,101 @@ void kron_prod(Matrix &a, Matrix &b, Matrix &res){
         }
     }
 }
+
+
+void adjacency_mul(Matrix& x, Matrix& res, int rowx, int colx, int srcx,int srcy){
+
+    res.alloc(rowx*colx,1);
+    //std::cout << "full size" << rowx*colx << std::endl;
+    float* rawx = x.get_data();
+    float* rawres = res.get_data();
+    //res.alloc(rowx,colx);
+    adjacency_mul_kernel(rawx,rawres,rowx,colx,srcx,srcy);
+}
+
+
+//TODO:change to cuda
+void adjacency_mul_kernel(float *x, float *res, int rowx, int colx, int srcx, int srcy){
+    std::vector<int> neighs;
+    for(int i=0; i < rowx; i ++){
+        find_neighbour(i, srcx,srcy, neighs);
+        int neigh_size = neighs.size();
+        for (int j = 0; j < colx; j++){
+            float val = 0.0f;
+            for (int vstart = 0; vstart < neigh_size; vstart++){
+                val += (x[j*rowx+neighs[vstart]]);
+            }
+            val -= (neigh_size * x[j*rowx + i]);
+            //std::cout << j*rowx+i << std::endl;
+            res[j*rowx+i] = val;
+        }
+    }
+}
+
+
+//TODO: change to device_vector
+void find_neighbour(int i, int m, int n, std::vector<int> res){
+    res.clear();
+    int idxes[4] = {i-m,i+m,i-1,i+1};
+    bool exist[4] = {true,true,true,true};
+    if(i % m == 0){
+        exist[2] = false;
+    }
+    if((i % n) == (n - 1)){
+        exist[3] = false;
+    }
+    if(i < m){
+        exist[0] = false;
+    }
+    if(i > (n*m-1-m)){
+        exist[1] = false;
+    }
+    for(int s = 0; s < 4; s ++){
+        if(exist[s]){
+            res.push_back(idxes[s]);
+        }
+    }
+}
+
+void matrix_sub(Matrix& a,Matrix& b,Matrix& c,Matrix& res){
+    int arow = a.getrow();
+    int acol = a.getcol();
+    int brow = b.getrow();
+    int bcol = b.getcol();
+    int crow = c.getrow();
+    int ccol = c.getcol();
+    if (arow != brow || arow != crow){
+        throw "matrix sub failed.";
+    }
+    if (acol != bcol || acol != ccol){
+        throw "matrix sub failed.";
+    }
+    res.alloc(arow,acol);
+    matrix_sub_kernel(a.get_data(),b.get_data(),c.get_data(),res.get_data(),arow*acol);
+}
+
+
+//TODO: change to gpu
+void matrix_sub_kernel(float* a,float* b,float* c,float* res, int size){
+    for(int i=0; i < size; i ++){
+        res[i] = a[i] - b[i] - c[i];
+    }
+}
+
+float dot(Matrix &a,Matrix &b){
+    if (a.getcol() != 1||b.getcol() != 1 || a.getrow() != b.getrow()) {
+        throw "dot product failed.";
+    }
+    return dot_kernel(a.get_data(),b.get_data(),a.getrow());
+}
+
+
+
+//TODO: change to gpu
+float dot_kernel(float *a,float *b, int size){
+    float res = 0.0f;
+    for(int i = 0; i < size; i ++){
+        res += (a[i]*b[i]);
+    }
+    return res;
+}

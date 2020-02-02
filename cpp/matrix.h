@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <iostream>
 #include <algorithm>
+#include <cstring>
 #include "helper.h"
 
 /*
