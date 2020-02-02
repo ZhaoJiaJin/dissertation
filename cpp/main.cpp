@@ -46,7 +46,8 @@ int main(int argc, char *argv[]){
     Solu sl(&a,&t,&y,m,n,bign);
 
     sl.solve();
-    double residual = sl.verifyans();
+    /*double residual = sl.verifyans();
     std::cout << "Real Residual:" << residual << std::endl;
+    */
     return 0;
 }

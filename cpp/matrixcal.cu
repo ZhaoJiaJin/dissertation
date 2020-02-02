@@ -33,6 +33,7 @@ __global__
 void mul_kernel(double *a, double *b, double *c, int m, int n, int p){
     int index = threadIdx.x;
     int stride = blockDim.x;
+    //printf("index:%d, stride:%d", index,stride);
     double tmp;
     for(int x = index; x < m; x += stride){
         for(int y = 0; y < p; y ++){
@@ -181,7 +182,9 @@ void mul(Matrix &a, Matrix &b, Matrix &res){
     res.alloc(rowa,colb);
     int blockSize = 1024;
     int blocks = (rowa + blockSize - 1) / blockSize;
+    std::cout << blocks << std::endl;
     mul_kernel<<<blocks,blockSize>>>(a.get_data(),b.get_data(), res.get_data(), rowa,cola,colb);
+    cudaDeviceSynchronize();
 }
 
 
@@ -254,6 +257,7 @@ void adjacency_mul(Matrix& x, Matrix& res, int rowx, int colx, int srcx,int srcy
     int blockSize = 1024;
     int blocks = (rowx + blockSize - 1) / blockSize;
     adjacency_mul_kernel<<<blocks,blockSize>>>(rawx,rawres,rowx,colx,srcx,srcy);
+    cudaDeviceSynchronize();
 }
 
 
@@ -275,6 +279,7 @@ void matrix_sub(Matrix& a,Matrix& b,Matrix& c,Matrix& res){
     int blockSize = 1024;
     int blocks = (arow*acol + blockSize - 1) / blockSize;
     matrix_sub_kernel<<<blocks,blockSize>>>(a.get_data(),b.get_data(),c.get_data(),res.get_data(),arow*acol);
+    cudaDeviceSynchronize();
 }
 
 
@@ -302,6 +307,7 @@ void matrix_add(Matrix& a,Matrix& b,Matrix& res){
     int blockSize = 1024;
     int blocks = (arow*acol + blockSize - 1) / blockSize;
     matrix_add_kernel<<<blocks,blockSize>>>(a.get_data(),b.get_data(),res.get_data(),arow*acol);
+    cudaDeviceSynchronize();
 }
 
 
@@ -319,6 +325,7 @@ void matrix_add_scale(Matrix& a,Matrix& b,double scale,Matrix &res){
     int blockSize = 1024;
     int blocks = (arow*acol + blockSize - 1) / blockSize;
     matrix_add_scale_kernel<<<blocks,blockSize>>>(a.get_data(),b.get_data(),scale,res.get_data(),arow*acol);
+    cudaDeviceSynchronize();
 }
 
 

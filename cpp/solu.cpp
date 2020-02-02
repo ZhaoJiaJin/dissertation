@@ -28,7 +28,6 @@ void Solu::init(){
 
 double Solu::solve(){
     calb();
-
     int leng = b.getrow();
     answer.alloc(leng,1);
     Matrix v1;
