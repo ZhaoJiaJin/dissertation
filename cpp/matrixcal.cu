@@ -1,6 +1,33 @@
 #include "matrixcal.h"
 
 
+//TODO: change to device_vector
+/*__device__
+void find_neighbour(int i, int m, int n, thrust::device_vector<int> res){
+    res.clear();
+    int idxes[4] = {i-m,i+m,i-1,i+1};
+    bool exist[4] = {true,true,true,true};
+    if(i % m == 0){
+        exist[2] = false;
+    }
+    if((i % n) == (n - 1)){
+        exist[3] = false;
+    }
+    if(i < m){
+        exist[0] = false;
+    }
+    if(i > (n*m-1-m)){
+        exist[1] = false;
+    }
+    for(int s = 0; s < 4; s ++){
+        if(exist[s]){
+            res.push_back(idxes[s]);
+        }
+    }
+}*/
+
+
+
 //TODO:gpu
 __global__
 void mul_kernel(double *a, double *b, double *c, int m, int n, int p){
@@ -11,9 +38,9 @@ void mul_kernel(double *a, double *b, double *c, int m, int n, int p){
         for(int y = 0; y < p; y ++){
             tmp = 0;
             for(int t = 0; t < n; t++){
-                tmp += (a[cal_idx(x,t,m,n)] * b[cal_idx(t,y,n,p)]);
+                tmp += (a[x+t*m] * b[t+y*n]);
             }
-            c[cal_idx(x,y,m,p)] = tmp;
+            c[x+y*m] = tmp;
         }
     }
 }
@@ -22,11 +49,34 @@ void mul_kernel(double *a, double *b, double *c, int m, int n, int p){
 //TODO:change to cuda
 __global__
 void adjacency_mul_kernel(double *x, double *res, int rowx, int colx, int srcx, int srcy){
-    thrust::device_vector<int> neighs;
     int index = threadIdx.x;
     int stride = blockDim.x;
     for(int i=index; i < rowx; i += stride){
-        find_neighbour(i, srcx,srcy, neighs);
+        //find_neighbour(i, srcx,srcy, neighs);
+
+    thrust::device_vector<int> neighs;
+    int m = srcx;
+    int n = srcy;
+    int idxes[4] = {i-m,i+m,i-1,i+1};
+    bool exist[4] = {true,true,true,true};
+    if(i % m == 0){
+        exist[2] = false;
+    }
+    if((i % n) == (n - 1)){
+        exist[3] = false;
+    }
+    if(i < m){
+        exist[0] = false;
+    }
+    if(i > (n*m-1-m)){
+        exist[1] = false;
+    }
+    for(int s = 0; s < 4; s ++){
+        if(exist[s]){
+            neighs.push_back(idxes[s]);
+        }
+    }
+
         int neigh_size = neighs.size();
         for (int j = 0; j < colx; j++){
             double val = 0.0f;
@@ -207,30 +257,6 @@ void adjacency_mul(Matrix& x, Matrix& res, int rowx, int colx, int srcx,int srcy
 }
 
 
-
-//TODO: change to device_vector
-void find_neighbour(int i, int m, int n, thrust::device_vector<int> res){
-    res.clear();
-    int idxes[4] = {i-m,i+m,i-1,i+1};
-    bool exist[4] = {true,true,true,true};
-    if(i % m == 0){
-        exist[2] = false;
-    }
-    if((i % n) == (n - 1)){
-        exist[3] = false;
-    }
-    if(i < m){
-        exist[0] = false;
-    }
-    if(i > (n*m-1-m)){
-        exist[1] = false;
-    }
-    for(int s = 0; s < 4; s ++){
-        if(exist[s]){
-            res.push_back(idxes[s]);
-        }
-    }
-}
 
 void matrix_sub(Matrix& a,Matrix& b,Matrix& c,Matrix& res){
     int arow = a.getrow();
