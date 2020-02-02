@@ -2,7 +2,6 @@
 #define _MATRIXCAL_H
 
 #include "matrix.h"
-#include <vector>
 #include<fstream>
 #include <cstdlib>
 #include "cuda_runtime.h"
@@ -19,7 +18,7 @@ void kron_prod(Matrix &a,Matrix &b, Matrix &res);
 
 void adjacency_mul(Matrix& x, Matrix &res, int rowx, int colx, int srcx,int srcy);
 //void adjacency_mul_kernel(double *x, double *res, int rowx, int colx, int srcx,int srcy);
-void find_neighbour(int i, int m, int n, std::vector<int> res);
+void find_neighbour(int i, int m, int n, thrust::device_vector<int> res);
 
 void matrix_sub(Matrix& a,Matrix& b,Matrix& c,Matrix& res);
 //void matrix_sub_kernel(double* a,double* b,double* c,double* res, int size);
