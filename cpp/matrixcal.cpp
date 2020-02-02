@@ -215,3 +215,50 @@ float dot_kernel(float *a,float *b, int size){
     }
     return res;
 }
+
+void matrix_add(Matrix& a,Matrix& b,Matrix& res){
+    int arow = a.getrow();
+    int acol = a.getcol();
+    int brow = b.getrow();
+    int bcol = b.getcol();
+    if (arow != brow){
+        throw "matrix sub failed.";
+    }
+    if (acol != bcol){
+        throw "matrix sub failed.";
+    }
+    res.alloc(arow,acol);
+    matrix_add_kernel(a.get_data(),b.get_data(),res.get_data(),arow*acol);
+}
+
+
+//TODO: change to gpu
+void matrix_add_kernel(float* a,float* b,float* res, int size){
+    for(int i=0; i < size; i ++){
+        res[i] = a[i] + b[i] ;
+    }
+}
+
+void matrix_add_scale(Matrix& a,Matrix& b,float scale,Matrix &res){
+    int arow = a.getrow();
+    int acol = a.getcol();
+    int brow = b.getrow();
+    int bcol = b.getcol();
+    if (arow != brow){
+        throw "matrix sub failed.";
+    }
+    if (acol != bcol){
+        throw "matrix sub failed.";
+    }
+    matrix_add_scale_kernel(a.get_data(),b.get_data(),scale,res.get_data(),arow*acol);
+}
+
+
+//TODO: change to gpu
+void matrix_add_scale_kernel(float* a,float* b,float scale,float* res, int size){
+    for(int i=0; i < size; i ++){
+        res[i] = a[i] + scale*b[i] ;
+    }
+}
+
+

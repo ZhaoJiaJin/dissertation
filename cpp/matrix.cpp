@@ -20,11 +20,13 @@ Matrix::Matrix(int x, bool is_iden){
 
 
 void Matrix::alloc(int x, int y){
-    row = x;
-    col = y;
     //TODO:
     //cudaMallocManaged(&data, x*y*sizeof(float));
-    data = new float[x*y];
+    if (data == nullptr){
+        row = x;
+        col = y;
+        data = new float[x*y];
+    }
     memset(data,0,x*y);
 }
 
@@ -181,11 +183,10 @@ int Matrix::resize(int newr, int newc){
 }
 
 void Matrix::copy(Matrix& other){
-	row = other.getrow();
-	col = other.getcol();
 
     //TODO: change copy method
-	data = new float[row*col];
+	//data = new float[row*col];
+    alloc(other.getrow(),other.getcol());
 	float* otherdata = other.get_data();
     for (int i = 0; i < row*col; i ++){
         data[i] = otherdata[i];

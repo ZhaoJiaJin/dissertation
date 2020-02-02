@@ -21,6 +21,10 @@ void find_neighbour(int i, int m, int n, std::vector<int> res);
 
 void matrix_sub(Matrix& a,Matrix& b,Matrix& c,Matrix& res);
 void matrix_sub_kernel(float* a,float* b,float* c,float* res, int size);
+void matrix_add(Matrix& a,Matrix& b,Matrix& res);
+void matrix_add_kernel(float* a,float* b,float* res, int size);
+void matrix_add_scale(Matrix& a,Matrix& b,float scale,Matrix &res);
+void matrix_add_scale_kernel(float* a,float* b,float scale,float* res, int size);
 
 float dot(Matrix &a,Matrix &b);
 float dot_kernel(float *a,float *b, int size);
