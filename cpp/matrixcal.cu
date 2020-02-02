@@ -54,34 +54,34 @@ void adjacency_mul_kernel(double *x, double *res, int rowx, int colx, int srcx, 
     for(int i=index; i < rowx; i += stride){
         //find_neighbour(i, srcx,srcy, neighs);
 
-    thrust::device_vector<int> neighs;
     int m = srcx;
     int n = srcy;
     int idxes[4] = {i-m,i+m,i-1,i+1};
     bool exist[4] = {true,true,true,true};
+    int neigh_size = 4;
     if(i % m == 0){
         exist[2] = false;
+        neigh_size --;
     }
     if((i % n) == (n - 1)){
         exist[3] = false;
+        neigh_size --;
     }
     if(i < m){
         exist[0] = false;
+        neigh_size --;
     }
     if(i > (n*m-1-m)){
         exist[1] = false;
-    }
-    for(int s = 0; s < 4; s ++){
-        if(exist[s]){
-            neighs.push_back(idxes[s]);
-        }
+        neigh_size --;
     }
 
-        int neigh_size = neighs.size();
         for (int j = 0; j < colx; j++){
             double val = 0.0f;
-            for (int vstart = 0; vstart < neigh_size; vstart++){
-                val += (x[j*rowx+neighs[vstart]]);
+            for (int vstart = 0; vstart < 4; vstart++){
+                if (exist[vstart]){
+                    val += (x[j*rowx+idxes[vstart]]);
+                }
             }
             val -= (neigh_size * x[j*rowx + i]);
             //std::cout << j*rowx+i << std::endl;
