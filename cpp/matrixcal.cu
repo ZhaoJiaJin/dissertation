@@ -1,5 +1,91 @@
 #include "matrixcal.h"
 
+
+//TODO:gpu
+__global__
+void mul_kernel(double *a, double *b, double *c, int m, int n, int p){
+    int index = threadIdx.x;
+    int stride = blockDim.x;
+    double tmp;
+    for(int x = index; x < m; x += stride){
+        for(int y = 0; y < p; y ++){
+            tmp = 0;
+            for(int t = 0; t < n; t++){
+                tmp += (a[cal_idx(x,t,m,n)] * b[cal_idx(t,y,n,p)]);
+            }
+            c[cal_idx(x,y,m,p)] = tmp;
+        }
+    }
+}
+
+
+//TODO:change to cuda
+__global__
+void adjacency_mul_kernel(double *x, double *res, int rowx, int colx, int srcx, int srcy){
+    std::vector<int> neighs;
+    int index = threadIdx.x;
+    int stride = blockDim.x;
+    for(int i=index; i < rowx; i += stride){
+        find_neighbour(i, srcx,srcy, neighs);
+        int neigh_size = neighs.size();
+        for (int j = 0; j < colx; j++){
+            double val = 0.0f;
+            for (int vstart = 0; vstart < neigh_size; vstart++){
+                val += (x[j*rowx+neighs[vstart]]);
+            }
+            val -= (neigh_size * x[j*rowx + i]);
+            //std::cout << j*rowx+i << std::endl;
+            res[j*rowx+i] = val;
+        }
+    }
+}
+
+
+//TODO: change to gpu
+__global__
+void matrix_sub_kernel(double* a,double* b,double* c,double* res, int size){
+    int index = threadIdx.x;
+    int stride = blockDim.x;
+    for(int i=index; i < size; i += stride){
+        res[i] = a[i] - b[i] - c[i];
+    }
+}
+
+
+//TODO: change to gpu
+double dot_kernel(double *a,double *b, int size){
+    double res = 0.0f;
+    for(int i = 0; i < size; i ++){
+        res += (a[i]*b[i]);
+    }
+    return res;
+}
+
+
+
+//TODO: change to gpu
+__global__
+void matrix_add_kernel(double* a,double* b,double* res, int size){
+    int index = threadIdx.x;
+    int stride = blockDim.x;
+    for(int i=index; i < size; i += stride){
+        res[i] = a[i] + b[i] ;
+    }
+}
+
+
+//TODO: change to gpu
+__global__
+void matrix_add_scale_kernel(double* a,double* b,double scale,double* res, int size){
+    int index = threadIdx.x;
+    int stride = blockDim.x;
+    for(int i=index; i < size; i += stride){
+        res[i] = a[i] + scale*b[i] ;
+    }
+}
+
+
+
 void randomMatrix(Matrix &m){
     for (int i = 0; i < m.getrow(); i ++){
         for (int j = 0; j < m.getcol(); j ++){
@@ -43,23 +129,12 @@ void mul(Matrix &a, Matrix &b, Matrix &res){
     }
 
     res.alloc(rowa,colb);
-
-    mul_kernel(a.get_data(),b.get_data(), res.get_data(), rowa,cola,colb);
+    int blockSize = 1024;
+    int blocks = (rowa + blockSize - 1) / blockSize;
+    mul_kernel<<<blocks,blockSize>>>(a.get_data(),b.get_data(), res.get_data(), rowa,cola,colb);
 }
 
 
-void mul_kernel(double *a, double *b, double *c, int m, int n, int p){
-    double tmp;
-    for(int x = 0; x < m; x ++){
-        for(int y = 0; y < p; y ++){
-            tmp = 0;
-            for(int t = 0; t < n; t++){
-                tmp += (a[cal_idx(x,t,m,n)] * b[cal_idx(t,y,n,p)]);
-            }
-            c[cal_idx(x,y,m,p)] = tmp;
-        }
-    }
-}
 
 /*
  * kron_mul perform reshape and kronecker product, the caller should perform transpose of the left matrix by itself.
@@ -126,27 +201,11 @@ void adjacency_mul(Matrix& x, Matrix& res, int rowx, int colx, int srcx,int srcy
     double* rawx = x.get_data();
     double* rawres = res.get_data();
     //res.alloc(rowx,colx);
-    adjacency_mul_kernel(rawx,rawres,rowx,colx,srcx,srcy);
+    int blockSize = 1024;
+    int blocks = (rowx + blockSize - 1) / blockSize;
+    adjacency_mul_kernel<<<blocks,blockSize>>>(rawx,rawres,rowx,colx,srcx,srcy);
 }
 
-
-//TODO:change to cuda
-void adjacency_mul_kernel(double *x, double *res, int rowx, int colx, int srcx, int srcy){
-    std::vector<int> neighs;
-    for(int i=0; i < rowx; i ++){
-        find_neighbour(i, srcx,srcy, neighs);
-        int neigh_size = neighs.size();
-        for (int j = 0; j < colx; j++){
-            double val = 0.0f;
-            for (int vstart = 0; vstart < neigh_size; vstart++){
-                val += (x[j*rowx+neighs[vstart]]);
-            }
-            val -= (neigh_size * x[j*rowx + i]);
-            //std::cout << j*rowx+i << std::endl;
-            res[j*rowx+i] = val;
-        }
-    }
-}
 
 
 //TODO: change to device_vector
@@ -187,16 +246,11 @@ void matrix_sub(Matrix& a,Matrix& b,Matrix& c,Matrix& res){
         throw "matrix sub failed.";
     }
     res.alloc(arow,acol);
-    matrix_sub_kernel(a.get_data(),b.get_data(),c.get_data(),res.get_data(),arow*acol);
+    int blockSize = 1024;
+    int blocks = (arow*acol + blockSize - 1) / blockSize;
+    matrix_sub_kernel<<<blocks,blockSize>>>(a.get_data(),b.get_data(),c.get_data(),res.get_data(),arow*acol);
 }
 
-
-//TODO: change to gpu
-void matrix_sub_kernel(double* a,double* b,double* c,double* res, int size){
-    for(int i=0; i < size; i ++){
-        res[i] = a[i] - b[i] - c[i];
-    }
-}
 
 double dot(Matrix &a,Matrix &b){
     if (a.getcol() != 1||b.getcol() != 1 || a.getrow() != b.getrow()) {
@@ -206,15 +260,6 @@ double dot(Matrix &a,Matrix &b){
 }
 
 
-
-//TODO: change to gpu
-double dot_kernel(double *a,double *b, int size){
-    double res = 0.0f;
-    for(int i = 0; i < size; i ++){
-        res += (a[i]*b[i]);
-    }
-    return res;
-}
 
 void matrix_add(Matrix& a,Matrix& b,Matrix& res){
     int arow = a.getrow();
@@ -228,16 +273,11 @@ void matrix_add(Matrix& a,Matrix& b,Matrix& res){
         throw "matrix sub failed.";
     }
     res.alloc(arow,acol);
-    matrix_add_kernel(a.get_data(),b.get_data(),res.get_data(),arow*acol);
+    int blockSize = 1024;
+    int blocks = (arow*acol + blockSize - 1) / blockSize;
+    matrix_add_kernel<<<blocks,blockSize>>>(a.get_data(),b.get_data(),res.get_data(),arow*acol);
 }
 
-
-//TODO: change to gpu
-void matrix_add_kernel(double* a,double* b,double* res, int size){
-    for(int i=0; i < size; i ++){
-        res[i] = a[i] + b[i] ;
-    }
-}
 
 void matrix_add_scale(Matrix& a,Matrix& b,double scale,Matrix &res){
     int arow = a.getrow();
@@ -250,15 +290,9 @@ void matrix_add_scale(Matrix& a,Matrix& b,double scale,Matrix &res){
     if (acol != bcol){
         throw "matrix sub failed.";
     }
-    matrix_add_scale_kernel(a.get_data(),b.get_data(),scale,res.get_data(),arow*acol);
-}
-
-
-//TODO: change to gpu
-void matrix_add_scale_kernel(double* a,double* b,double scale,double* res, int size){
-    for(int i=0; i < size; i ++){
-        res[i] = a[i] + scale*b[i] ;
-    }
+    int blockSize = 1024;
+    int blocks = (arow*acol + blockSize - 1) / blockSize;
+    matrix_add_scale_kernel<<<blocks,blockSize>>>(a.get_data(),b.get_data(),scale,res.get_data(),arow*acol);
 }
 
 
