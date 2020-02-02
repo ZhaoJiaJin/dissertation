@@ -21,11 +21,11 @@ Matrix::Matrix(int x, bool is_iden){
 
 void Matrix::alloc(int x, int y){
     //TODO:
-    //cudaMallocManaged(&data, x*y*sizeof(float));
+    //cudaMallocManaged(&data, x*y*sizeof(double));
     if (data == nullptr){
         row = x;
         col = y;
-        data = new float[x*y];
+        data = new double[x*y];
     }
     memset(data,0,x*y);
 }
@@ -42,7 +42,7 @@ Matrix::Matrix(const Matrix& other){
 	row = other.getrow();
 	col = other.getcol();
 
-	data = new float[row*col];
+	data = new double[row*col];
 	otherdata = other.get_data();
 	std::copy(std::begin(otherdata), std::end(otherdata), std::begin(data));
 }
@@ -52,7 +52,7 @@ Matirx& operator=(const Matrix& other){
 	if(&other != this){
 		delete[] data;
 		data = nullptr;
-		data = new float[row*col];
+		data = new double[row*col];
 		std::copy( std::begin(other.data), std::end(other.data), std::begin(data));
 		row = other.getrow();
 		col = other.getcol();
@@ -75,7 +75,7 @@ void Matrix::print(){
     }
 }
 
-float Matrix::get(int i, int j){
+double Matrix::get(int i, int j){
     if ((i >= row) || (j >= col)){
         throw "x or y exceed matrix size!";
     }
@@ -89,7 +89,7 @@ float Matrix::get(int i, int j){
     return data[cal_idx(i,j,row,col)];
 }
 
-void Matrix::set(int i,int j,float v){
+void Matrix::set(int i,int j,double v){
     if ((i >= row) || (j >= col)){
         throw "x or y exceed matrix size!";
     }
@@ -99,7 +99,7 @@ void Matrix::set(int i,int j,float v){
     data[cal_idx(i,j,row,col)] = v;
 }
 
-void Matrix::set_by_idx(int i,float v){
+void Matrix::set_by_idx(int i,double v){
     if (i >= row*col){
         throw "x or y exceed matrix size!";
     }
@@ -109,7 +109,7 @@ void Matrix::set_by_idx(int i,float v){
     data[i] = v;
 }
 
-void Matrix::set_diagonal(int i, float v){
+void Matrix::set_diagonal(int i, double v){
     set(i,i,v);
 }
 
@@ -136,7 +136,7 @@ int Matrix::getcol(){
     return col;
 }
 
-float* Matrix::get_data(){
+double* Matrix::get_data(){
     if (is_identity() && (data == nullptr)){
         alloc(row,col);
         for(int i = 0; i < row; i ++){
@@ -185,9 +185,9 @@ int Matrix::resize(int newr, int newc){
 void Matrix::copy(Matrix& other){
 
     //TODO: change copy method
-	//data = new float[row*col];
+	//data = new double[row*col];
     alloc(other.getrow(),other.getcol());
-	float* otherdata = other.get_data();
+	double* otherdata = other.get_data();
     for (int i = 0; i < row*col; i ++){
         data[i] = otherdata[i];
     }

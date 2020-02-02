@@ -24,24 +24,24 @@ public:
   void alloc(int x, int y);
   void print();
   void crop(Matrix &newm);
-  float get(int i, int j);
-  void set(int i, int j,float v);
-  void set_by_idx(int i, float v);
-  void set_diagonal(int i, float v);
-  //void push_back(float v);
+  double get(int i, int j);
+  void set(int i, int j,double v);
+  void set_by_idx(int i, double v);
+  void set_diagonal(int i, double v);
+  //void push_back(double v);
   int getrow();
   int getcol();
-  float* get_data();
+  double* get_data();
   void t(Matrix& t);
   bool is_identity();
   int resize(int newr,int newc);
   void copy(Matrix& other);
   /*Matrix kronReshapeMul()
   // v shape has to be row*1
-  float dot(Matrix v);*/
+  double dot(Matrix v);*/
 
 private:
-  float* data;
+  double* data;
   int row, col;
   bool identity;
 

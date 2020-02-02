@@ -11,7 +11,7 @@ void randomMatrix(Matrix &m){
 int load_from_file(std::string fname, Matrix &m){
     std::ifstream infile(fname);
     int i = 0;
-    float t = 0.0000000000000000000;
+    double t = 0.0000000000000000000;
     while(infile >> t){
         m.set_by_idx(i,t);
         i++;
@@ -22,7 +22,7 @@ int load_from_file(std::string fname, Matrix &m){
 int load_diagonal(std::string fname, Matrix &m){
     std::ifstream infile(fname);
     int i = 0;
-    float t = 0.0000000000000000000;
+    double t = 0.0000000000000000000;
     while(infile >> t){
         m.set_diagonal(i,t);
         i++;
@@ -48,8 +48,8 @@ void mul(Matrix &a, Matrix &b, Matrix &res){
 }
 
 
-void mul_kernel(float *a, float *b, float *c, int m, int n, int p){
-    float tmp;
+void mul_kernel(double *a, double *b, double *c, int m, int n, int p){
+    double tmp;
     for(int x = 0; x < m; x ++){
         for(int y = 0; y < p; y ++){
             tmp = 0;
@@ -123,21 +123,21 @@ void adjacency_mul(Matrix& x, Matrix& res, int rowx, int colx, int srcx,int srcy
 
     res.alloc(rowx*colx,1);
     //std::cout << "full size" << rowx*colx << std::endl;
-    float* rawx = x.get_data();
-    float* rawres = res.get_data();
+    double* rawx = x.get_data();
+    double* rawres = res.get_data();
     //res.alloc(rowx,colx);
     adjacency_mul_kernel(rawx,rawres,rowx,colx,srcx,srcy);
 }
 
 
 //TODO:change to cuda
-void adjacency_mul_kernel(float *x, float *res, int rowx, int colx, int srcx, int srcy){
+void adjacency_mul_kernel(double *x, double *res, int rowx, int colx, int srcx, int srcy){
     std::vector<int> neighs;
     for(int i=0; i < rowx; i ++){
         find_neighbour(i, srcx,srcy, neighs);
         int neigh_size = neighs.size();
         for (int j = 0; j < colx; j++){
-            float val = 0.0f;
+            double val = 0.0f;
             for (int vstart = 0; vstart < neigh_size; vstart++){
                 val += (x[j*rowx+neighs[vstart]]);
             }
@@ -192,13 +192,13 @@ void matrix_sub(Matrix& a,Matrix& b,Matrix& c,Matrix& res){
 
 
 //TODO: change to gpu
-void matrix_sub_kernel(float* a,float* b,float* c,float* res, int size){
+void matrix_sub_kernel(double* a,double* b,double* c,double* res, int size){
     for(int i=0; i < size; i ++){
         res[i] = a[i] - b[i] - c[i];
     }
 }
 
-float dot(Matrix &a,Matrix &b){
+double dot(Matrix &a,Matrix &b){
     if (a.getcol() != 1||b.getcol() != 1 || a.getrow() != b.getrow()) {
         throw "dot product failed.";
     }
@@ -208,8 +208,8 @@ float dot(Matrix &a,Matrix &b){
 
 
 //TODO: change to gpu
-float dot_kernel(float *a,float *b, int size){
-    float res = 0.0f;
+double dot_kernel(double *a,double *b, int size){
+    double res = 0.0f;
     for(int i = 0; i < size; i ++){
         res += (a[i]*b[i]);
     }
@@ -233,13 +233,13 @@ void matrix_add(Matrix& a,Matrix& b,Matrix& res){
 
 
 //TODO: change to gpu
-void matrix_add_kernel(float* a,float* b,float* res, int size){
+void matrix_add_kernel(double* a,double* b,double* res, int size){
     for(int i=0; i < size; i ++){
         res[i] = a[i] + b[i] ;
     }
 }
 
-void matrix_add_scale(Matrix& a,Matrix& b,float scale,Matrix &res){
+void matrix_add_scale(Matrix& a,Matrix& b,double scale,Matrix &res){
     int arow = a.getrow();
     int acol = a.getcol();
     int brow = b.getrow();
@@ -255,7 +255,7 @@ void matrix_add_scale(Matrix& a,Matrix& b,float scale,Matrix &res){
 
 
 //TODO: change to gpu
-void matrix_add_scale_kernel(float* a,float* b,float scale,float* res, int size){
+void matrix_add_scale_kernel(double* a,double* b,double scale,double* res, int size){
     for(int i=0; i < size; i ++){
         res[i] = a[i] + scale*b[i] ;
     }

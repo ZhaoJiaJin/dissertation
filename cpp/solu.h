@@ -9,7 +9,7 @@ class Solu
 {
 public:
     Solu(Matrix *a_, Matrix *t_,Matrix *y_, int m_, int n_, int bign_);
-    float solve();
+    double solve();
 
 private:
     Matrix *a;

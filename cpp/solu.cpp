@@ -26,7 +26,7 @@ void Solu::init(){
 }
 
 
-float Solu::solve(){
+double Solu::solve(){
     calb();
 
     int leng = b.getrow();
@@ -38,32 +38,34 @@ float Solu::solve(){
     Matrix r;
     matrix_sub(b,v1,v2,r);
     Matrix p;
-    std::cout << r.getrow() << r.getcol() << std::endl;
     p.copy(r);
-    std::cout << p.getrow() << p.getcol() << std::endl;
 
-    float r_k_norm = dot(r,r);
+    double r_k_norm = dot(r,r);
     //std::cout << r_k_norm << std::endl;
-    //for(int i = 1; i < 2*leng; i ++){
-    for(int i = 1; i < 10; i ++){
+    for(int i = 1; i < 2*leng; i ++){
+    //for(int i = 1; i < 10; i ++){
         std::cout << "Ite:" << i << std::endl;
         calQx(p, v1);
         calBtCBX(p,v2);
         Matrix q;
         matrix_add(v1,v2,q);
-        float alpha = r_k_norm / dot(p,q);
+        double alpha = r_k_norm / dot(p,q);
         matrix_add_scale(answer,p,alpha,answer);
         //std::cout << alpha << std::endl;
 
         matrix_add_scale(r,q, alpha*-1,r);
 
-        float r_k1_norm = dot(r,r);
+        /*calQx(answer, v1);
+        calBtCBX(answer,v2);
+        matrix_sub(b,v1,v2,r);*/
+
+        double r_k1_norm = dot(r,r);
         std::cout << "New R:" << r_k1_norm << std::endl;
-        float beta = r_k1_norm/r_k_norm;
+        double beta = r_k1_norm/r_k_norm;
         r_k_norm = r_k1_norm;
 
-        if (r_k1_norm < 1e-3){
-            std::cout << "Stop At Ite:" << i << r_k1_norm << std::endl;
+        if (r_k1_norm < 1e-10){
+            std::cout << "Stop At Ite:" << i << " "<< r_k1_norm << std::endl;
             break;
         }
         matrix_add_scale(r,p,beta,p);
