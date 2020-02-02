@@ -5,7 +5,6 @@
 #include<fstream>
 #include <cstdlib>
 #include "cuda_runtime.h"
-#include "kernel.h"
 
 void randomMatrix(Matrix &m);
 int load_from_file(std::string fname, Matrix &m);
