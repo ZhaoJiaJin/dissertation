@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cstring>
 #include "helper.h"
-#include <cuda_runtime.h>
+#include <thrust/device_vector.h>
 
 /*
  * due to how kronecker and reshape works, 

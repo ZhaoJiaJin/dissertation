@@ -22,7 +22,7 @@ void mul_kernel(double *a, double *b, double *c, int m, int n, int p){
 //TODO:change to cuda
 __global__
 void adjacency_mul_kernel(double *x, double *res, int rowx, int colx, int srcx, int srcy){
-    std::vector<int> neighs;
+    thrust::device_vector<int> neighs;
     int index = threadIdx.x;
     int stride = blockDim.x;
     for(int i=index; i < rowx; i += stride){
@@ -209,7 +209,7 @@ void adjacency_mul(Matrix& x, Matrix& res, int rowx, int colx, int srcx,int srcy
 
 
 //TODO: change to device_vector
-void find_neighbour(int i, int m, int n, std::vector<int> res){
+void find_neighbour(int i, int m, int n, thrust::device_vector<int> res){
     res.clear();
     int idxes[4] = {i-m,i+m,i-1,i+1};
     bool exist[4] = {true,true,true,true};
