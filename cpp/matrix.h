@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstring>
 #include "helper.h"
+#include <cuda_runtime.h>
 
 /*
  * due to how kronecker and reshape works, 

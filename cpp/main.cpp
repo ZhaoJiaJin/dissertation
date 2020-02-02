@@ -48,28 +48,5 @@ int main(int argc, char *argv[]){
     sl.solve();
     double residual = sl.verifyans();
     std::cout << "Real Residual:" << residual << std::endl;
-    //Matrix nnt(3,true);
-    /*Matrix a(m,n);
-    //Matrix t(m,m);
-    randomMatrix(a);
-    //randomMatrix(t);
-    a.print();
-    t.print();
-    Matrix kres;
-    kron_prod(a,t,kres);
-    //std::cout << "result" << std::endl;
-
-
-    Matrix y(9,1);
-    randomMatrix(y);
-    Matrix res;
-    mul(kres,y,res);
-    res.print();
-
-    Matrix at;
-    a.t(at);
-    Matrix newres;
-    kron_mul(at, t, y,newres);
-    newres.print();*/
     return 0;
 }

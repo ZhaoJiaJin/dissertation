@@ -20,12 +20,16 @@ Matrix::Matrix(int x, bool is_iden){
 
 
 void Matrix::alloc(int x, int y){
-    //TODO:
-    //cudaMallocManaged(&data, x*y*sizeof(double));
+    //TODO:cudaMallocManaged(&data, x*y*sizeof(double));
     if (data == nullptr){
         row = x;
         col = y;
-        data = new double[x*y];
+        //data = new double[x*y];
+        cudaError_t result = cudaMalloc((void**)&data, x*y* sizeof(double));
+        if (result != cudaSuccess)
+        {
+            throw std::runtime_error("failed to allocate device memory");
+        }
     }
     memset(data,0,x*y);
 }
