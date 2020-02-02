@@ -46,6 +46,8 @@ int main(int argc, char *argv[]){
     Solu sl(&a,&t,&y,m,n,bign);
 
     sl.solve();
+    double residual = sl.verifyans();
+    std::cout << "Real Residual:" << residual << std::endl;
     //Matrix nnt(3,true);
     /*Matrix a(m,n);
     //Matrix t(m,m);

@@ -10,6 +10,7 @@ class Solu
 public:
     Solu(Matrix *a_, Matrix *t_,Matrix *y_, int m_, int n_, int bign_);
     double solve();
+    double verifyans();
 
 private:
     Matrix *a;

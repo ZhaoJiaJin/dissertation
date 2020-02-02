@@ -96,3 +96,13 @@ void Solu::calBtCBX(Matrix &x, Matrix &res){
     x.resize(bign*n,1);
     res.resize(bign*n,1);
 }
+
+double Solu::verifyans(){
+    Matrix v1;
+    Matrix v2;
+    calQx(answer, v1);
+    calBtCBX(answer,v2);
+    Matrix r;
+    matrix_sub(b,v1,v2,r);
+    return dot(r,r);
+}
