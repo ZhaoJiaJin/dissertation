@@ -31,8 +31,10 @@ void find_neighbour(int i, int m, int n, thrust::device_vector<int> res){
 //TODO:gpu
 __global__
 void mul_kernel(double *a, double *b, double *c, int m, int n, int p){
-    int index = threadIdx.x;
-    int stride = blockDim.x;
+    //int index = threadIdx.x;
+    //int stride = blockDim.x;
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+      int stride = blockDim.x * gridDim.x;
     //printf("index:%d, stride:%d", index,stride);
     double tmp;
     for(int x = index; x < m; x += stride){
@@ -50,8 +52,10 @@ void mul_kernel(double *a, double *b, double *c, int m, int n, int p){
 //TODO:change to cuda
 __global__
 void adjacency_mul_kernel(double *x, double *res, int rowx, int colx, int srcx, int srcy){
-    int index = threadIdx.x;
-    int stride = blockDim.x;
+    //int index = threadIdx.x;
+    //int stride = blockDim.x;
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+      int stride = blockDim.x * gridDim.x;
     for(int i=index; i < rowx; i += stride){
         //find_neighbour(i, srcx,srcy, neighs);
 
@@ -95,8 +99,10 @@ void adjacency_mul_kernel(double *x, double *res, int rowx, int colx, int srcx, 
 //TODO: change to gpu
 __global__
 void matrix_sub_kernel(double* a,double* b,double* c,double* res, int size){
-    int index = threadIdx.x;
-    int stride = blockDim.x;
+    //int index = threadIdx.x;
+    //int stride = blockDim.x;
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+      int stride = blockDim.x * gridDim.x;
     for(int i=index; i < size; i += stride){
         res[i] = a[i] - b[i] - c[i];
     }
@@ -117,8 +123,10 @@ double dot_kernel(double *a,double *b, int size){
 //TODO: change to gpu
 __global__
 void matrix_add_kernel(double* a,double* b,double* res, int size){
-    int index = threadIdx.x;
-    int stride = blockDim.x;
+    //int index = threadIdx.x;
+    //int stride = blockDim.x;
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+      int stride = blockDim.x * gridDim.x;
     for(int i=index; i < size; i += stride){
         res[i] = a[i] + b[i] ;
     }
@@ -128,8 +136,10 @@ void matrix_add_kernel(double* a,double* b,double* res, int size){
 //TODO: change to gpu
 __global__
 void matrix_add_scale_kernel(double* a,double* b,double scale,double* res, int size){
-    int index = threadIdx.x;
-    int stride = blockDim.x;
+    //int index = threadIdx.x;
+    //int stride = blockDim.x;
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+      int stride = blockDim.x * gridDim.x;
     for(int i=index; i < size; i += stride){
         res[i] = a[i] + scale*b[i] ;
     }
@@ -199,6 +209,7 @@ void mul(Matrix &a, Matrix &b, Matrix &res){
     res.alloc(rowa,colb);
     int blockSize = 1024;
     int blocks = (rowa + blockSize - 1) / blockSize;
+    printf("blocksize:%d, blocks:%d\n",blockSize,blocks);
     mul_kernel<<<blocks,blockSize>>>(a.get_data(),b.get_data(), res.get_data(), rowa,cola,colb);
     cudaDeviceSynchronize();
 }
