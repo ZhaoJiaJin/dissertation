@@ -150,8 +150,8 @@ void matrix_add_scale_kernel(double* a,double* b,double scale,double* res, int s
 void randomMatrix(Matrix &m){
     for (int i = 0; i < m.getrow(); i ++){
         for (int j = 0; j < m.getcol(); j ++){
-            //m.set(i,j,rand() % 10);
-            m.set(i,j, i);
+            m.set(i,j,rand() % 10);
+            //m.set(i,j, i);
         }
     }
 }

@@ -28,54 +28,48 @@ void Solu::init(){
 
 double Solu::solve(){
     calb();
-    b.printraw("b:");
     int leng = b.getrow();
     answer.alloc(leng,1);
     Matrix v1;
     Matrix v2;
     calQx(answer, v1);
     calBtCBX(answer,v2);
-    v1.printraw("v1:");
-    v2.printraw("v2:");
     Matrix r;
     matrix_sub(b,v1,v2,r);
-    r.printraw("r:");
     Matrix p;
     p.copy(r);
     double r_k_norm = dot(r,r);
-    //std::cout << "r_k_norm:" << r_k_norm << std::endl;
     printf("r_k_norm:%.17g\n", r_k_norm);
-    //std::cout << r_k_norm << std::endl;
-    r.printraw("r:");
-    p.printraw("p:");
     answer.printraw("ans:");
     for(int i = 1; i < 2*leng; i ++){
     //for(int i = 1; i < 10; i ++){
-    	//p.print("Matrix p");
         std::cout << "Ite:" << i << std::endl;
         calQx(p, v1);
         calBtCBX(p,v2);
         Matrix q;
         matrix_add(v1,v2,q);
-	q.printraw("q:");
         double alpha = r_k_norm / dot(p,q);
-	//std::cout << "alpha:" << alpha << std::endl;
     	printf("alpha:%.17g\n", alpha);
         matrix_add_scale(answer,p,alpha,answer);
-	answer.printraw("ans:");
-        //std::cout << alpha << std::endl;
 
-	if(i%5 != 0){
+	//if(i%5 != 0){
         matrix_add_scale(r,q, alpha*-1,r);
-	}else{
+	/*}else{
 
-        calQx(answer, v1);
-        calBtCBX(answer,v2);
-        matrix_sub(b,v1,v2,r);
-	}
-	r.printraw("r:");
+        	calQx(answer, v1);
+        	calBtCBX(answer,v2);
+        	matrix_sub(b,v1,v2,r);
+	}*/
 
         double r_k1_norm = dot(r,r);
+
+        if (r_k1_norm < 1e-14){
+		printf("recalcute r!!!\n");
+        	calQx(answer, v1);
+        	calBtCBX(answer,v2);
+        	matrix_sub(b,v1,v2,r);
+        	r_k1_norm = dot(r,r);
+	}
         //std::cout << "NewR:" << r_k1_norm << std::endl;
     	printf("NewR:%.17g\n", r_k1_norm);
         double beta = r_k1_norm/r_k_norm;
@@ -87,7 +81,6 @@ double Solu::solve(){
             break;
         }
         matrix_add_scale(r,p,beta,p);
-	p.printraw("p:");
     }
     
     return 0;
