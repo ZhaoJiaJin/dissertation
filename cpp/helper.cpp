@@ -2,7 +2,7 @@
 
 
 int calN(int level){
-    return pow(4,level) * 1;
+    return pow(4,level) * 12;
 }
 
 void most_square(int v, int& orix, int& oriy){

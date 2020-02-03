@@ -27,7 +27,7 @@ int main(int argc, char *argv[]){
     
     int level = atoi(level_c);
     int bign = calN(level);
-    //std::cout << "level is " << level << " N is " << bign << std::endl;
+    std::cout << "level is " << level << " N is " << bign << std::endl;
     Matrix origina (originm,originn);
     Matrix origint (originm,originm);
 
