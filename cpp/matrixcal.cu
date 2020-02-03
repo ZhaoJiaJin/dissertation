@@ -140,29 +140,46 @@ void matrix_add_scale_kernel(double* a,double* b,double scale,double* res, int s
 void randomMatrix(Matrix &m){
     for (int i = 0; i < m.getrow(); i ++){
         for (int j = 0; j < m.getcol(); j ++){
-            m.set(i,j,rand() % 10);
+            //m.set(i,j,rand() % 10);
+            m.set(i,j, i);
         }
     }
 }
 
 int load_from_file(std::string fname, Matrix &m){
     std::ifstream infile(fname);
-    int i = 0;
-    double t = 0.0000000000000000000;
-    while(infile >> t){
-        m.set_by_idx(i,t);
-        i++;
+    double t = 0.0;
+    for(int i = 0; i < m.getrow(); i ++){
+    	for(int j = 0; j < m.getcol(); j ++){
+		if(infile >> t){
+			m.set(i,j,t);
+		}else{
+			return -1;
+		}
+	}
     }
     return 0;
 }
 
 int load_diagonal(std::string fname, Matrix &m){
     std::ifstream infile(fname);
+    //infile.open(fname, ios_base::in); 
     int i = 0;
-    double t = 0.0000000000000000000;
-    while(infile >> t){
+    //double t = 0.00;
+    /*while(infile >> t){
+	std::cout << t << std::endl;
         m.set_diagonal(i,t);
         i++;
+	t = 0.00;
+    }*/
+    for(std::string line; std::getline(infile, line); ){
+    	std::istringstream in(line);    
+    	double t = 0.00;
+	while(in >> t){
+	//std::cout << t << std::endl;
+        m.set_diagonal(i,t);
+        i++;
+	}
     }
     return 0;
 
@@ -182,7 +199,6 @@ void mul(Matrix &a, Matrix &b, Matrix &res){
     res.alloc(rowa,colb);
     int blockSize = 1024;
     int blocks = (rowa + blockSize - 1) / blockSize;
-    std::cout << blocks << std::endl;
     mul_kernel<<<blocks,blockSize>>>(a.get_data(),b.get_data(), res.get_data(), rowa,cola,colb);
     cudaDeviceSynchronize();
 }

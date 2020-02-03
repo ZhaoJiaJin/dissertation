@@ -7,6 +7,7 @@
 #include <cstring>
 #include "helper.h"
 #include <thrust/device_vector.h>
+#include <string>
 
 /*
  * due to how kronecker and reshape works, 
@@ -24,6 +25,8 @@ public:
   //Matirx& operator=(const Matrix& other);
   void alloc(int x, int y);
   void print();
+  void print(std::string v);
+  void printraw(std::string v);
   void crop(Matrix &newm);
   double get(int i, int j);
   void set(int i, int j,double v);

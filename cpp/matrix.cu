@@ -32,7 +32,9 @@ void Matrix::alloc(int x, int y){
             throw std::runtime_error("failed to allocate device memory");
         }
     }
-    memset(data,0,x*y);
+    for(int i = 0; i < row*col; i++){
+    	data[i] = 0;
+    }
 }
 
 Matrix::~Matrix(){
@@ -67,11 +69,31 @@ Matirx& operator=(const Matrix& other){
 	return *this;
 }*/
 
+
+void Matrix::print(std::string v){
+	std::cout << v;
+	print();
+}
+
+void Matrix::printraw(std::string v){
+	std::cout << v;
+    for (int i=0; i < row; i++) {
+        for (int j=0; j < col; j ++){
+		    //std::cout << get(i,j) << " ";
+		    printf("%.17g ", get(i,j));
+        }
+    }
+    std::cout << std::endl;
+
+}
+
+
+
 void Matrix::print(){
     //std::cout << data[0] << std::endl;
     //return;
 	std::cout << std::endl;
-    std::cout << std::setiosflags(std::ios_base::showpoint);
+    //std::cout << std::setiosflags(std::ios_base::showpoint);
     for (int i=0; i < row; i++) {
 	    std::cout << "[";
         for (int j=0; j < col; j ++){
