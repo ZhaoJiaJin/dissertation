@@ -81,7 +81,7 @@ double Solu::solve(){
         double beta = r_k1_norm/r_k_norm;
         r_k_norm = r_k1_norm;
 
-        if (r_k1_norm < 0.001){
+        if (r_k1_norm < 1e-14){
             //std::cout << "Stop:" << i << " "<< r_k1_norm << std::endl;
     	    printf("Stop:%d %.17g\n", i,r_k1_norm);
             break;
