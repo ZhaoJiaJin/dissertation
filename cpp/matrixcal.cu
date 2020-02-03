@@ -209,7 +209,7 @@ void mul(Matrix &a, Matrix &b, Matrix &res){
     res.alloc(rowa,colb);
     int blockSize = 1024;
     int blocks = (rowa + blockSize - 1) / blockSize;
-    printf("blocksize:%d, blocks:%d\n",blockSize,blocks);
+    //printf("blocksize:%d, blocks:%d\n",blockSize,blocks);
     mul_kernel<<<blocks,blockSize>>>(a.get_data(),b.get_data(), res.get_data(), rowa,cola,colb);
     cudaDeviceSynchronize();
 }

@@ -65,12 +65,15 @@ double Solu::solve(){
 	answer.printraw("ans:");
         //std::cout << alpha << std::endl;
 
+	if(i%5 != 0){
         matrix_add_scale(r,q, alpha*-1,r);
-	r.printraw("r:");
+	}else{
 
-        /*calQx(answer, v1);
+        calQx(answer, v1);
         calBtCBX(answer,v2);
-        matrix_sub(b,v1,v2,r);*/
+        matrix_sub(b,v1,v2,r);
+	}
+	r.printraw("r:");
 
         double r_k1_norm = dot(r,r);
         //std::cout << "NewR:" << r_k1_norm << std::endl;
