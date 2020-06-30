@@ -6,6 +6,7 @@ import(
     "conjugate/config"
     "conjugate/utils"
     "conjugate/solu"
+    "strings"
     "math/rand"
     "gonum.org/v1/gonum/mat"
     "fmt"
@@ -28,7 +29,7 @@ func main(){
     flag.IntVar(&m,"m",9,"value of m")
     flag.IntVar(&n,"n",4,"value of n")
     flag.IntVar(&threadNum,"th",10,"the number of thread")
-    flag.StringVar(&method,"method","ite","use which method, ite|std|both")
+    flag.StringVar(&method,"method","syl","use which method,  you can choose ite,std,and syl")
     flag.Parse()
 
     bigN := utils.CalN(lvl)
@@ -43,25 +44,47 @@ func main(){
 
     a := config.GetMatrixA(m,n)
     t := config.GetMatrixT(m)
-    var resStd mat.Vector
-    var resIte mat.Vector
-    if method == "ite" || method == "both"{
-        begin := time.Now().Unix()
-        sl := solu.NewIteSolu(a,t,m,n,bigN,lvl,y,threadNum)
-        resIte = sl.FindSolution()
-        end := time.Now().Unix()
-        fmt.Println("iterate method time cost:",end - begin)
+    allres := make(map[string]mat.Vector)
+    methods := strings.Split(method,",")
+    for _,mtd := range methods{
+        if method == "ite" {
+            var res mat.Vector
+            begin := time.Now().Unix()
+            sl := solu.NewIteSolu(a,t,m,n,bigN,lvl,y,threadNum)
+            res = sl.FindSolution()
+            end := time.Now().Unix()
+            fmt.Println("iterate method time cost:",end - begin)
+            allres[mtd] = res
+        }
+        if method == "std" {
+            var res mat.Vector
+            begin := time.Now().Unix()
+            sl := solu.NewStdSolu(a,t,m,n,bigN,lvl,y)
+            res = sl.FindSolution()
+            end := time.Now().Unix()
+            fmt.Println("standard method time cost:",end - begin)
+            allres[mtd] = res
+        }
+        if method == "syl"{
+            var res mat.Vector
+            begin := time.Now().Unix()
+            res = solu.NewSylSolu(a,t,m,n,bigN,lvl,y,threadNum)
+            //res = sl.FindSolution()
+            end := time.Now().Unix()
+            fmt.Println("syl method time cost:",end - begin)
+            allres[mtd] = res
+
+        }
     }
-    if method == "std" || method == "both"{
-        begin := time.Now().Unix()
-        sl := solu.NewStdSolu(a,t,m,n,bigN,lvl,y)
-        resStd = sl.FindSolution()
-        end := time.Now().Unix()
-        fmt.Println("standard method time cost:",end - begin)
-    }
-    if method == "both"{
-        distance := new(mat.VecDense)
-        distance.SubVec(resIte,resStd)
-        fmt.Printf("||x-x0|| = %v\n",mat.Dot(distance,distance))
+    for idx1 := 0; idx1 < len(methods); idx1 ++{
+        for idx2 := idx1+1; idx2 < len(methods); idx2 ++{
+            k1 := methods[idx1]
+            k2 := methods[idx2]
+            tmpres1 := allres[k1]
+            tmpres2 := allres[k2]
+            distance := new(mat.VecDense)
+            distance.SubVec(tmpres1,tmpres2)
+            fmt.Printf("Distance between %s and %s is %v\n",k1,k2,mat.Dot(distance,distance))
+        }
     }
 }
