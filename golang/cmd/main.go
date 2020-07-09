@@ -26,8 +26,8 @@ func main(){
     flag.StringVar(&afile, "afile", "config/a.csv", "matrix A config file")
     flag.StringVar(&tfile, "tfile", "config/t.csv", "matrix T config file")
     flag.IntVar(&lvl, "lvl", 1, "level number")
-    flag.IntVar(&m,"m",9,"value of m")
-    flag.IntVar(&n,"n",4,"value of n")
+    flag.IntVar(&m,"m",3,"value of m")
+    flag.IntVar(&n,"n",2,"value of n")
     flag.IntVar(&threadNum,"th",10,"the number of thread")
     flag.StringVar(&method,"method","syl","use which method,  you can choose ite,std,and syl")
     flag.Parse()
@@ -68,7 +68,7 @@ func main(){
         if method == "syl"{
             var res mat.Vector
             begin := time.Now().Unix()
-            res = solu.NewSylSolu(a,t,m,n,bigN,lvl,y,threadNum)
+            res = solu.NewSylSolu(a,t,m,n,bigN,lvl,y,threadNum,1e-5)
             //res = sl.FindSolution()
             end := time.Now().Unix()
             fmt.Println("syl method time cost:",end - begin)
