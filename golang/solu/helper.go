@@ -34,7 +34,7 @@ func findNeighbors(i,m,n int)map[string]int{
     if i % m == 0{//the first row
         delete(res,U)
     }
-    if (i % n) == (n - 1){//the last row
+    if (i % m) == (m - 1){//the last row
         delete(res, D)
     }
     if i < m{ //the first column
