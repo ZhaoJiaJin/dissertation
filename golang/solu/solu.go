@@ -88,13 +88,13 @@ func (sl *IteSolu)FindSolution()mat.Vector{
     ori_norm := r_k_norm
     q := new(mat.VecDense)
     for i:=1; i<2*leng; i ++{
-        log.Println("Begin Itr:", i)
+        //log.Println("Begin Itr:", i)
         q.Reset()
         q.AddVec(sl.calQx(p),sl.calBtCBx(p))
         runtime.GC()
         alpha := r_k_norm / mat.Dot(p,q)
         x.AddScaledVec(x,alpha,p)
-        if i % 5 == 0{
+        if i % 2 == 0{
             r = vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
             runtime.GC()
         }else{

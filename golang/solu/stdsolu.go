@@ -2,6 +2,7 @@ package solu
 
 import(
     "gonum.org/v1/gonum/mat"
+    "fmt"
 )
 
 type StdSolu struct{
@@ -52,3 +53,22 @@ func (sl *StdSolu)FindSolution()mat.Vector{
     return res
 }
 
+
+func (sl *StdSolu) Validate(x mat.Vector){
+    BtC := new(mat.Dense)
+    BtC.Product(sl.B.T(), sl.C)
+
+    BtCB := new(mat.Dense)
+    BtCB.Product(BtC, sl.B)
+
+    A := new(mat.Dense)
+    A.Add(sl.Q, BtCB)
+
+    b := new(mat.VecDense)
+    b.MulVec(BtC, sl.y)
+
+    res := new(mat.Dense)
+    res.Product(A,x)
+    fmt.Printf("expect :\n%1.3f\n\n", mat.Formatted(b.T()))
+    fmt.Printf("got:\n%1.3f\n\n", mat.Formatted(res.T()))
+}

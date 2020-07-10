@@ -49,40 +49,30 @@ func getYHat(oriy []float64,a,t mat.Matrix, m,n,bign int)(mat.Matrix){
 func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, epsilon float64)(ret mat.Vector){
     //Compute eigendecomposition SHat = URUT
     sHat := getShat(a,t)
-    fmt.Printf("S Hat:\n%1.3f\n\n", mat.Formatted(sHat))
     //find eigenvectors and eigenvalues of sHat
-    var eig mat.EigenSym
-    ok := eig.Factorize(sHat, true)
-    if !ok {
-        log.Fatal("Eigendecomposition failed")
-    }
     srcx,srcy := utils.MostSqure(bign)
-    row,_ := sHat.Dims()
-    egvals := make([]float64,row)
-    eig.Values(egvals)
-    var egvects mat.Dense
-    eig.VectorsTo(&egvects)
-    //validSHat(&egvects, egvals)
+    R,U:= EigenSymFac(sHat)
+    //validSHat(U, R)
     yhat := getYHat(y,a,t,m,n,bign)
-    fmt.Println(yhat.Dims())
 
     //We need to store Q B and H
 
-    //Qs := make([]*mat.Dense,0)
+    Qs := make([]*mat.Dense,0)
     Bs := make([]*mat.Dense,0)
     Hs := make([]*mat.Dense,0)
-    V,B0 := FacQR(yhat)
+    V,B0 := QRFac(yhat)
     //fmt.Printf("y hat :\n%1.3f\n\n", mat.Formatted(yhat))
     // have V and B0 now
     Bs = append(Bs, B0)
     r := mat.Norm(B0,2)
     i := 0
     var Vold *mat.Dense
+    var Phi []float64
+    var Qi *mat.Dense
     for r > epsilon * mat.Norm(B0,2){
+        fmt.Println("Ite:",i)
         i ++
         // Lanczos steps
-        // cal W = AV
-        // we do it column by column
         W := mat.NewDense(bign,n,nil)
         for colidx:=0; colidx < n; colidx ++{
             coli := make([]float64,bign)
@@ -141,7 +131,6 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
         }
         H := new(mat.Dense)
         H.Product(V.T(),W)
-        fmt.Printf("H:\n%1.3f\n\n", mat.Formatted(H))
         Hs = append(Hs,H)
         VH := new(mat.Dense)
         VH.Product(V,H)
@@ -149,18 +138,17 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
 
         Vold = V
         curB := new(mat.Dense)
-        V,curB = FacQR(W)
+        V,curB = QRFac(W)
         Bs = append(Bs, curB)
 
         /* computing residual norm ******************************* */
-        r = 0
         // combine H and B to get Ti
-        T = mat.NewSymDense(n*i,nil)
+        T := mat.NewSymDense(n*i,nil)
         // Set Hi in the diagonal
         for hidx:=0; hidx < i; hidx ++{
             curh := Hs[hidx]
             for ridx := 0; ridx < n; ridx ++{
-                for cidx = ridx; cidx < n; cidx ++{
+                for cidx := ridx; cidx < n; cidx ++{
                     T.SetSym(hidx*n + ridx, hidx * n + cidx, curh.At(ridx,cidx))
                 }
             }
@@ -168,14 +156,143 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
         // Set Bi in the upper diagonal
         for bidx := 0; bidx < i-1; bidx ++{
             curb := Bs[bidx]
+            for ridx := 0; ridx < n; ridx ++{
+                for cidx := ridx; cidx < n; cidx ++{
+                    T.SetSym(bidx*n+ridx,bidx*n+n+cidx, curb.At(ridx,cidx))
+                }
+            }
         }
+        Phi,Qi = EigenSymFac(T)
+        Qs = append(Qs,Qi)
+        E1 := GetEi(0, i, n)
+        var UTB0T mat.Dense
+        UTB0T.Product(U.T(),B0.T())
+        var E1TQi mat.Dense
+        E1TQi.Product(E1.T(), Qi)
+        var S mat.Dense
+        S.Product(&UTB0T,&E1TQi)
+        Em := GetEi(i-1,i,n)
+        var J mat.Dense
+        J.Product(Qi,Em, curB.T())
+        //fmt.Printf("T:\n%1.3f\n\n", mat.Formatted(&S))
+        //fmt.Printf("T:\n%1.3f\n\n", mat.Formatted(&J))
+        rowS,_ := S.Dims()
+        r = 0
+        for j := 0; j < n; j ++{
+            Kdiagonal := make([]float64,len(Phi))
+            for tmpidx := 0; tmpidx < len(Phi); tmpidx ++{
+                Kdiagonal[tmpidx] = 1/(Phi[tmpidx] + R[j])
+            }
+            Kinverse := mat.NewDiagDense(len(Kdiagonal),Kdiagonal)
+            ej := make([]float64,rowS)
+            ej[j] = 1
+            ejmat := mat.NewDense(rowS,1,ej)
+            var deltaVec mat.Dense
+            deltaVec.Product(ejmat.T(),&S,Kinverse,&J)
+            //fmt.Printf("delta:\n%1.3f\n\n", mat.Formatted(&deltaVec))
+            //r += 
+            var deltaV mat.Dense
+            deltaV.Product(&deltaVec,deltaVec.T())
+            //fmt.Printf("delta:\n%1.3f\n\n", mat.Formatted(&deltaV))
+            rowdelta,coldelta := deltaV.Dims()
+            if rowdelta != 1 || coldelta != 1{
+                panic("residual delta should have wrong size")
+            }
+            r += deltaV.At(0,0)
+        }
+        fmt.Println("new residual",r)
 
     }
-    return nil
+    E1 := GetEi(0, i, n)
+    var QE1B0U mat.Dense
+    QE1B0U.Product(Qi.T(),E1,B0,U)
+    rows,cols := QE1B0U.Dims()
+    ek := mat.NewDense(1,rows,nil)
+    er := mat.NewDense(cols,1,nil)
+    F := mat.NewDense(i*n,n,nil)
+    for k:=0; k < i*n; k++{
+        for rho:=0; rho < n; rho++{
+            ek.Set(0,k,1)
+            er.Set(rho,0,1)
+            var curF mat.Dense
+            curF.Product(ek,&QE1B0U,er)
+            F.Set(k,rho,curF.At(0,0)/(Phi[k] + R[rho]))
+            ek.Set(0,k,0)
+            er.Set(rho,0,0)
+        }
+    }
+    var Z mat.Dense
+    Z.Product(Qi,F,U.T())
+    M := mat.NewDense(bign,n,nil)
+    B0Inver := new(mat.Dense)
+    B0Inver.Inverse(B0)
+    V = new(mat.Dense)
+    V.Product(yhat,B0Inver)
+    Zrawdata := Z.RawMatrix().Data
+    //fmt.Printf("Z:\n%1.3f\n\n", mat.Formatted(&Z))
+    for j:=1; j<=i; j++{
+        Gi := mat.NewDense(n,n,Zrawdata[n*n*(j-1):n*n*j])
+        //fmt.Printf("G:\n%1.3f\n\n", mat.Formatted(Gi))
+        var VGi mat.Dense
+        VGi.Product(V,Gi)
+        M.Add(M,&VGi)
+
+        W := mat.NewDense(bign,n,nil)
+        for colidx:=0; colidx < n; colidx ++{
+            coli := make([]float64,bign)
+            for r := 0; r < bign; r ++{
+                coli[r] = V.At(r,colidx)
+            }
+            d1res := make([]float64, bign)
+            operator := &DXOpe{
+                X:coli,
+                Res:d1res,
+                ThreadNum:threadNum,
+                Rowx:bign,
+                Colx:1,
+                Srcx:srcx,
+                Srcy:srcy,
+            }
+            operator.Calculate()
+            d2res := make([]float64, bign)
+            operator = &DXOpe{
+                X:d1res,
+                Res:d2res,
+                ThreadNum:threadNum,
+                Rowx:bign,
+                Colx:1,
+                Srcx:srcx,
+                Srcy:srcy,
+            }
+            operator.Calculate()
+
+            W.SetCol(colidx,d2res)
+        }
+        if j>1{
+            var VoldB mat.Dense
+            VoldB.Product(Vold,Bs[j-2])
+            W.Sub(W,&VoldB)
+        }
+        VH := new(mat.Dense)
+        VH.Product(V,Hs[j-1])
+        W.Sub(W,VH)
+        Vold = V
+        BInverse := new(mat.Dense)
+        BInverse.Inverse(Bs[j])
+        V.Product(W,BInverse)
+    }
+    resdata := make([]float64,0,bign*n)
+    for colidx := 0; colidx < n; colidx ++{
+        for rowidx := 0; rowidx < bign; rowidx ++{
+            resdata = append(resdata, M.At(rowidx,colidx))
+        }
+    }
+    res := mat.NewVecDense(bign*n, resdata)
+    return res
 }
 
 
-func FacQR(A mat.Matrix)(*mat.Dense,*mat.Dense){
+func QRFac(A mat.Matrix)(*mat.Dense,*mat.Dense){
     bign,n := A.Dims()
     var qrfac mat.QR
     qrfac.Factorize(A)
@@ -197,4 +314,27 @@ func FacQR(A mat.Matrix)(*mat.Dense,*mat.Dense){
         }
     }
     return V,B
+}
+
+func EigenSymFac(A mat.Symmetric)([]float64, *mat.Dense){
+    var eig mat.EigenSym
+    ok := eig.Factorize(A, true)
+    if !ok {
+        log.Fatal("Eigendecomposition failed")
+    }
+    row,_ := A.Dims()
+    egvals := make([]float64,row)
+    eig.Values(egvals)
+    var egvects mat.Dense
+    eig.VectorsTo(&egvects)
+    return egvals, &egvects
+}
+
+func GetEi(idx, j, n int)(*mat.Dense){
+    res := mat.NewDense(j*n,n,nil)
+    startrow := idx * n
+    for curidx := 0; curidx < n; curidx ++{
+        res.Set(startrow + curidx, curidx, 1)
+    }
+    return res
 }

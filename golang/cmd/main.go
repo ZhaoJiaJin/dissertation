@@ -34,7 +34,7 @@ func main(){
 
     bigN := utils.CalN(lvl)
     sizey := m * bigN
-    fmt.Printf("-----------lvl:%v, N:%v------------\n",lvl,bigN)
+    fmt.Printf("-----------lvl:%v, N:%v, m:%v, n:%v------------\n",lvl,bigN,m,n)
     y := make([]float64,sizey)
     for i := range y{
         y[i] = float64(rand.Intn(60))
@@ -46,8 +46,14 @@ func main(){
     t := config.GetMatrixT(m)
     allres := make(map[string]mat.Vector)
     methods := strings.Split(method,",")
+
+    stdsl := solu.NewStdSolu(a,t,m,n,bigN,lvl,y)
+    stdsl.FindSolution()
+    //stdsl.Validate(tmpres)
+
+
     for _,mtd := range methods{
-        if method == "ite" {
+        if mtd == "ite" {
             var res mat.Vector
             begin := time.Now().Unix()
             sl := solu.NewIteSolu(a,t,m,n,bigN,lvl,y,threadNum)
@@ -55,8 +61,10 @@ func main(){
             end := time.Now().Unix()
             fmt.Println("iterate method time cost:",end - begin)
             allres[mtd] = res
+            fmt.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
+            //stdsl.Validate(res)
         }
-        if method == "std" {
+        if mtd == "std" {
             var res mat.Vector
             begin := time.Now().Unix()
             sl := solu.NewStdSolu(a,t,m,n,bigN,lvl,y)
@@ -64,16 +72,19 @@ func main(){
             end := time.Now().Unix()
             fmt.Println("standard method time cost:",end - begin)
             allres[mtd] = res
+            fmt.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
+            //stdsl.Validate(res)
         }
-        if method == "syl"{
+        if mtd == "syl"{
             var res mat.Vector
             begin := time.Now().Unix()
-            res = solu.NewSylSolu(a,t,m,n,bigN,lvl,y,threadNum,1e-5)
+            res = solu.NewSylSolu(a,t,m,n,bigN,lvl,y,threadNum,1e-7)
             //res = sl.FindSolution()
             end := time.Now().Unix()
             fmt.Println("syl method time cost:",end - begin)
             allres[mtd] = res
-
+            fmt.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
+            stdsl.Validate(res)
         }
     }
     for idx1 := 0; idx1 < len(methods); idx1 ++{
