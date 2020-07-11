@@ -3,6 +3,7 @@ package solu
 import(
     "gonum.org/v1/gonum/mat"
     "conjugate/utils"
+    "math"
     "fmt"
     "log"
 )
@@ -69,7 +70,7 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
     var Vold *mat.Dense
     var Phi []float64
     var Qi *mat.Dense
-    for r > epsilon * mat.Norm(B0,2){
+    for math.Sqrt(r) > epsilon * mat.Norm(B0,2){
         fmt.Println("Ite:",i)
         i ++
         // Lanczos steps

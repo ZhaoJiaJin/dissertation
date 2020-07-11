@@ -78,7 +78,7 @@ func main(){
         if mtd == "syl"{
             var res mat.Vector
             begin := time.Now().Unix()
-            res = solu.NewSylSolu(a,t,m,n,bigN,lvl,y,threadNum,1e-7)
+            res = solu.NewSylSolu(a,t,m,n,bigN,lvl,y,threadNum,1e-8)
             //res = sl.FindSolution()
             end := time.Now().Unix()
             fmt.Println("syl method time cost:",end - begin)

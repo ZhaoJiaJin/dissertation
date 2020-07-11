@@ -69,6 +69,6 @@ func (sl *StdSolu) Validate(x mat.Vector){
 
     res := new(mat.Dense)
     res.Product(A,x)
-    fmt.Printf("expect :\n%1.3f\n\n", mat.Formatted(b.T()))
-    fmt.Printf("got:\n%1.3f\n\n", mat.Formatted(res.T()))
+    fmt.Printf("expect :\n%1.2f\n\n", mat.Formatted(b.T()))
+    fmt.Printf("got:\n%1.2f\n\n", mat.Formatted(res.T()))
 }
