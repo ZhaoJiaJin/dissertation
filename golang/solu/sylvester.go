@@ -64,13 +64,18 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
     V,B0 := QRFac(yhat)
     //fmt.Printf("y hat :\n%1.3f\n\n", mat.Formatted(yhat))
     // have V and B0 now
-    Bs = append(Bs, B0)
+    //fmt.Printf("!!!!Y:\n%1.3f\n\n", mat.Formatted(yhat))
+    //Bs = append(Bs, B0)
     r := mat.Norm(B0,2)
     i := 0
     var Vold *mat.Dense
     var Phi []float64
     var Qi *mat.Dense
-    for math.Sqrt(r) > epsilon * mat.Norm(B0,2){
+    //var fullV *mat.Dense
+    //fullV = addv(fullV, V)
+    //validateT(fullV,lvl)
+    B0norm := mat.Norm(B0,2)
+    for math.Sqrt(r) > epsilon * B0norm{
         fmt.Println("Ite:",i)
         i ++
         // Lanczos steps
@@ -127,7 +132,7 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
 
         if i > 1{
             var VoldB mat.Dense
-            VoldB.Product(Vold,Bs[i-1])
+            VoldB.Product(Vold,Bs[len(Bs)-1])
             W.Sub(W,&VoldB)
         }
         H := new(mat.Dense)
@@ -139,8 +144,13 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
 
         Vold = V
         curB := new(mat.Dense)
+        //fmt.Printf("W:\n%1.3f\n\n", mat.Formatted(W))
         V,curB = QRFac(W)
+        //fmt.Printf("New V:\n%1.3f\n\n", mat.Formatted(V))
+        //fmt.Printf("New V:\n%1.3f\n\n", mat.Formatted(V))
         Bs = append(Bs, curB)
+        //fullV = addv(fullV,V)
+        //fmt.Printf("New Full V:\n%1.3f\n\n", mat.Formatted(fullV))
 
         /* computing residual norm ******************************* */
         // combine H and B to get Ti
@@ -158,11 +168,13 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
         for bidx := 0; bidx < i-1; bidx ++{
             curb := Bs[bidx]
             for ridx := 0; ridx < n; ridx ++{
-                for cidx := ridx; cidx < n; cidx ++{
-                    T.SetSym(bidx*n+ridx,bidx*n+n+cidx, curb.At(ridx,cidx))
+                for cidx := 0; cidx < n; cidx ++{
+                    T.SetSym(bidx*n+ridx,bidx*n+n+cidx, curb.At(cidx,ridx))
                 }
             }
         }
+        //fmt.Printf("T :\n%1.3f\n\n", mat.Formatted(T))
+        //validateT(fullV,lvl)
         Phi,Qi = EigenSymFac(T)
         Qs = append(Qs,Qi)
         E1 := GetEi(0, i, n)
@@ -279,7 +291,7 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
         W.Sub(W,VH)
         Vold = V
         BInverse := new(mat.Dense)
-        BInverse.Inverse(Bs[j])
+        BInverse.Inverse(Bs[j-1])
         V.Product(W,BInverse)
     }
     resdata := make([]float64,0,bign*n)
@@ -338,4 +350,31 @@ func GetEi(idx, j, n int)(*mat.Dense){
         res.Set(startrow + curidx, curidx, 1)
     }
     return res
+}
+
+func addv(full *mat.Dense,v mat.Matrix)(*mat.Dense){
+    if full == nil{
+        return mat.DenseCopyOf(v)
+    }
+    orow,ocol := full.Dims()
+    vrow,vcol := v.Dims()
+    ret := mat.NewDense(orow,ocol+vcol,nil)
+    for i:=0; i < orow; i++{
+        for j:=0; j < ocol; j++{
+            ret.Set(i,j,full.At(i,j))
+        }
+    }
+    for i:=0; i < vrow; i++{
+        for j:=0; j < vcol; j++{
+            ret.Set(i,ocol+j,v.At(i,j))
+        }
+    }
+    return ret
+}
+
+func validateT(V *mat.Dense, lvl int){
+    d := generateD(lvl)
+    var ttt mat.Dense
+    ttt.Product(V.T(),d,d,V)
+    fmt.Printf("TV:\n%1.3f\n\n", mat.Formatted(&ttt))
 }

@@ -7,7 +7,7 @@ import(
     "conjugate/utils"
     "conjugate/solu"
     "strings"
-    "math/rand"
+    //"math/rand"
     "gonum.org/v1/gonum/mat"
     "fmt"
 )
@@ -20,25 +20,33 @@ var(
     m int
     threadNum int
     method string
+    yfile string
 )
 
 func main(){
     flag.StringVar(&afile, "afile", "config/a.csv", "matrix A config file")
     flag.StringVar(&tfile, "tfile", "config/t.csv", "matrix T config file")
     flag.IntVar(&lvl, "lvl", 1, "level number")
-    flag.IntVar(&m,"m",3,"value of m")
-    flag.IntVar(&n,"n",2,"value of n")
+    flag.IntVar(&m,"m",9,"value of m")
+    flag.IntVar(&n,"n",4,"value of n")
     flag.IntVar(&threadNum,"th",10,"the number of thread")
     flag.StringVar(&method,"method","syl","use which method,  you can choose ite,std,and syl")
+    flag.StringVar(&yfile,"y","config/vectory","the vector y")
     flag.Parse()
 
     bigN := utils.CalN(lvl)
     sizey := m * bigN
     fmt.Printf("-----------lvl:%v, N:%v, m:%v, n:%v------------\n",lvl,bigN,m,n)
-    y := make([]float64,sizey)
-    for i := range y{
-        y[i] = float64(rand.Intn(60))
+    fully,err := utils.LoadY(yfile)
+    if err != nil{
+        panic(err)
     }
+    y := fully[:sizey]
+    //y := make([]float64,sizey)
+    /*for i := range y{
+        y[i] = float64(rand.Intn(50))
+        y[i] = float64(i)
+    }*/
     config.InitConfig(afile,tfile,y)
     //fmt.Println(config.Conf.Y)
 
@@ -47,10 +55,13 @@ func main(){
     allres := make(map[string]mat.Vector)
     methods := strings.Split(method,",")
 
-    stdsl := solu.NewStdSolu(a,t,m,n,bigN,lvl,y)
-    stdsl.FindSolution()
+    //stdsl := solu.NewStdSolu(a,t,m,n,bigN,lvl,y)
+    //stdsl.FindSolution()
     //stdsl.Validate(tmpres)
 
+    fmt.Printf("A:\n%1.3f\n\n", mat.Formatted(a))
+    fmt.Printf("T:\n%1.3f\n\n", mat.Formatted(t))
+    //fmt.Printf("y:\n%1.3f\n\n", y)
 
     for _,mtd := range methods{
         if mtd == "ite" {
@@ -61,7 +72,7 @@ func main(){
             end := time.Now().Unix()
             fmt.Println("iterate method time cost:",end - begin)
             allres[mtd] = res
-            fmt.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
+            //fmt.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
             //stdsl.Validate(res)
         }
         if mtd == "std" {
@@ -72,7 +83,7 @@ func main(){
             end := time.Now().Unix()
             fmt.Println("standard method time cost:",end - begin)
             allres[mtd] = res
-            fmt.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
+            //fmt.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
             //stdsl.Validate(res)
         }
         if mtd == "syl"{
@@ -83,8 +94,8 @@ func main(){
             end := time.Now().Unix()
             fmt.Println("syl method time cost:",end - begin)
             allres[mtd] = res
-            fmt.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
-            stdsl.Validate(res)
+            //fmt.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
+            //stdsl.Validate(res)
         }
     }
     for idx1 := 0; idx1 < len(methods); idx1 ++{
