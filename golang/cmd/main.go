@@ -9,7 +9,7 @@ import(
     "strings"
     //"math/rand"
     "gonum.org/v1/gonum/mat"
-    "fmt"
+    "log"
 )
 
 var(
@@ -36,19 +36,21 @@ func main(){
 
     bigN := utils.CalN(lvl)
     sizey := m * bigN
-    fmt.Printf("-----------lvl:%v, N:%v, m:%v, n:%v------------\n",lvl,bigN,m,n)
+    log.Printf("-----------lvl:%v, N:%v, m:%v, n:%v------------\n",lvl,bigN,m,n)
+    log.Println("begin to load vector y")
     fully,err := utils.LoadY(yfile)
+    log.Println("load vector y complete")
     if err != nil{
         panic(err)
     }
     y := fully[:sizey]
     //y := make([]float64,sizey)
     /*for i := range y{
-        y[i] = float64(rand.Intn(50))
+        //y[i] = float64(rand.Intn(50))
         y[i] = float64(i)
     }*/
     config.InitConfig(afile,tfile,y)
-    //fmt.Println(config.Conf.Y)
+    //log.Println(config.Conf.Y)
 
     a := config.GetMatrixA(m,n)
     t := config.GetMatrixT(m)
@@ -59,43 +61,52 @@ func main(){
     //stdsl.FindSolution()
     //stdsl.Validate(tmpres)
 
-    fmt.Printf("A:\n%1.3f\n\n", mat.Formatted(a))
-    fmt.Printf("T:\n%1.3f\n\n", mat.Formatted(t))
-    //fmt.Printf("y:\n%1.3f\n\n", y)
+    //log.Printf("A:\n%1.3f\n\n", mat.Formatted(a))
+    //log.Printf("T:\n%1.3f\n\n", mat.Formatted(t))
+    basesl := solu.NewIteSolu(a,t,m,n,bigN,lvl,y,threadNum)
 
     for _,mtd := range methods{
         if mtd == "ite" {
-            var res mat.Vector
+            log.Println("begin iteration method")
+            var res *mat.VecDense
             begin := time.Now().Unix()
             sl := solu.NewIteSolu(a,t,m,n,bigN,lvl,y,threadNum)
             res = sl.FindSolution()
             end := time.Now().Unix()
-            fmt.Println("iterate method time cost:",end - begin)
+            log.Println("iterate method time cost:",end - begin)
             allres[mtd] = res
-            //fmt.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
+            //log.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
             //stdsl.Validate(res)
+	    residual := basesl.CalR(res)
+	    log.Println("residual for iteration solution:",residual)
         }
         if mtd == "std" {
-            var res mat.Vector
+	    log.Println("begin standard method")
+            var res *mat.VecDense
             begin := time.Now().Unix()
             sl := solu.NewStdSolu(a,t,m,n,bigN,lvl,y)
             res = sl.FindSolution()
             end := time.Now().Unix()
-            fmt.Println("standard method time cost:",end - begin)
+            log.Println("standard method time cost:",end - begin)
             allres[mtd] = res
-            //fmt.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
+            //log.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
             //stdsl.Validate(res)
+	    residual := basesl.CalR(res)
+	    log.Println("residual for standard solution:",residual)
         }
         if mtd == "syl"{
-            var res mat.Vector
+	    log.Println("begin sylvester method")
+            var res *mat.VecDense
             begin := time.Now().Unix()
-            res = solu.NewSylSolu(a,t,m,n,bigN,lvl,y,threadNum,1e-8)
+            res = solu.NewSylSolu(a,t,m,n,bigN,lvl,y,threadNum,1e-10)
             //res = sl.FindSolution()
             end := time.Now().Unix()
-            fmt.Println("syl method time cost:",end - begin)
+            log.Println("syl method time cost:",end - begin)
             allres[mtd] = res
-            //fmt.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
+            //log.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
             //stdsl.Validate(res)
+	    residual := basesl.CalR(res)
+	    log.Println("residual for sylvester solution:",residual)
         }
     }
     for idx1 := 0; idx1 < len(methods); idx1 ++{
@@ -106,7 +117,7 @@ func main(){
             tmpres2 := allres[k2]
             distance := new(mat.VecDense)
             distance.SubVec(tmpres1,tmpres2)
-            fmt.Printf("Distance between %s and %s is %v\n",k1,k2,mat.Dot(distance,distance))
+            log.Printf("Distance between %s and %s is %v\n",k1,k2,mat.Dot(distance,distance))
         }
     }
 }

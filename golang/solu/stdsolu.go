@@ -35,7 +35,7 @@ func NewStdSolu(a,t mat.Matrix,m,n,bign,lvl int,y []float64)*StdSolu{
     return res
 }
 
-func (sl *StdSolu)FindSolution()mat.Vector{
+func (sl *StdSolu)FindSolution()(*mat.VecDense){
     BtC := new(mat.Dense)
     BtC.Product(sl.B.T(), sl.C)
 

@@ -3,7 +3,7 @@ package solu
 import(
     "gonum.org/v1/gonum/mat"
     "conjugate/utils"
-    "math"
+    //"math"
     "fmt"
     "log"
 )
@@ -31,7 +31,7 @@ func validSHat(U *mat.Dense, egvals []float64){
 
 
 // getYHat computes yHat  YHat = YTAP−1 
-func getYHat(oriy []float64,a,t mat.Matrix, m,n,bign int)(mat.Matrix){
+func getYHat(oriy []float64,a,t mat.Matrix, m,n,bign int)(*mat.Dense){
     //rearrange y
     Y := mat.NewDense(bign,m,nil)
     for idx,_ := range oriy{
@@ -47,7 +47,7 @@ func getYHat(oriy []float64,a,t mat.Matrix, m,n,bign int)(mat.Matrix){
 
 
 // NewSylSolu calculate result using Sylvester method
-func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, epsilon float64)(ret mat.Vector){
+func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, epsilon float64)(ret *mat.VecDense){
     //Compute eigendecomposition SHat = URUT
     sHat := getShat(a,t)
     //find eigenvectors and eigenvalues of sHat
@@ -66,7 +66,6 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
     // have V and B0 now
     //fmt.Printf("!!!!Y:\n%1.3f\n\n", mat.Formatted(yhat))
     //Bs = append(Bs, B0)
-    r := mat.Norm(B0,2)
     i := 0
     var Vold *mat.Dense
     var Phi []float64
@@ -75,7 +74,10 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
     //fullV = addv(fullV, V)
     //validateT(fullV,lvl)
     B0norm := mat.Norm(B0,2)
-    for math.Sqrt(r) > epsilon * B0norm{
+    oldr := B0norm * 2
+    r := B0norm
+    //for math.Sqrt(r) > epsilon * B0norm{
+    for oldr > r{
         fmt.Println("Ite:",i)
         i ++
         // Lanczos steps
@@ -190,6 +192,7 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
         //fmt.Printf("T:\n%1.3f\n\n", mat.Formatted(&S))
         //fmt.Printf("T:\n%1.3f\n\n", mat.Formatted(&J))
         rowS,_ := S.Dims()
+	oldr = r
         r = 0
         for j := 0; j < n; j ++{
             Kdiagonal := make([]float64,len(Phi))

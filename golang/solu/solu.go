@@ -72,7 +72,14 @@ func (sl *IteSolu)calBtCBx(x *mat.VecDense)mat.Vector{
     return mat.DenseCopyOf(&VMatrix{res}).ColView(0)
 }
 
-func (sl *IteSolu)FindSolution()mat.Vector{
+func (sl *IteSolu)CalR(x *mat.VecDense)float64{
+    b := sl.calb()
+    runtime.GC()
+    r := vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
+    return mat.Dot(r,r)
+}
+
+func (sl *IteSolu)FindSolution()(*mat.VecDense){
     b := sl.calb()
     runtime.GC()
 
@@ -94,12 +101,12 @@ func (sl *IteSolu)FindSolution()mat.Vector{
         runtime.GC()
         alpha := r_k_norm / mat.Dot(p,q)
         x.AddScaledVec(x,alpha,p)
-        if i % 2 == 0{
+        //if i % 2 == 0{
             r = vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
             runtime.GC()
-        }else{
-            r.AddScaledVec(r, alpha*-1, q)
-        }
+        //}else{
+        //    r.AddScaledVec(r, alpha*-1, q)
+        //}
 
         r_k1_norm := mat.Dot(r,r)
         beta := r_k1_norm/r_k_norm
