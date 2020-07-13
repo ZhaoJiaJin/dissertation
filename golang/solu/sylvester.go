@@ -61,7 +61,7 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
     Qs := make([]*mat.Dense,0)
     Bs := make([]*mat.Dense,0)
     Hs := make([]*mat.Dense,0)
-    V,B0 := QRFac(yhat)
+    V,B0 := ReducedQR(yhat)
     //fmt.Printf("y hat :\n%1.3f\n\n", mat.Formatted(yhat))
     // have V and B0 now
     //fmt.Printf("!!!!Y:\n%1.3f\n\n", mat.Formatted(yhat))
@@ -145,7 +145,7 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
         Vold = V
         curB := new(mat.Dense)
         //fmt.Printf("W:\n%1.3f\n\n", mat.Formatted(W))
-        V,curB = QRFac(W)
+        V,curB = ReducedQR(W)
         //fmt.Printf("New V:\n%1.3f\n\n", mat.Formatted(V))
         //fmt.Printf("New V:\n%1.3f\n\n", mat.Formatted(V))
         Bs = append(Bs, curB)
