@@ -72,7 +72,7 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
     var Qi *mat.Dense
     //var fullV *mat.Dense
     //fullV = addv(fullV, V)
-    //validateT(fullV,lvl)
+    //validateT(fullV,lvl,threadNum,srcx,srcy)
     B0norm := mat.Norm(B0,2)
     oldr := B0norm * 2
     r := B0norm
@@ -176,7 +176,7 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
             }
         }
         //fmt.Printf("T :\n%1.3f\n\n", mat.Formatted(T))
-        //validateT(fullV,lvl)
+        //validateT(fullV,lvl,threadNum,srcx,srcy)
         Phi,Qi = EigenSymFac(T)
         Qs = append(Qs,Qi)
         E1 := GetEi(0, i, n)
@@ -375,9 +375,42 @@ func addv(full *mat.Dense,v mat.Matrix)(*mat.Dense){
     return ret
 }
 
-func validateT(V *mat.Dense, lvl int){
-    d := generateD(lvl)
+func validateT(V *mat.Dense,lvl,threadNum,srcx,srcy int){
+    //d := generateD(lvl)
+    bign,n := V.Dims()
+    W := mat.NewDense(bign,n,nil)
+    for colidx:=0; colidx < n; colidx ++{
+            coli := make([]float64,bign)
+            for r := 0; r < bign; r ++{
+                coli[r] = V.At(r,colidx)
+            }
+            d1res := make([]float64, bign)
+            operator := &DXOpe{
+                X:coli,
+                Res:d1res,
+                ThreadNum:threadNum,
+                Rowx:bign,
+                Colx:1,
+                Srcx:srcx,
+                Srcy:srcy,
+            }
+            operator.Calculate()
+            d2res := make([]float64, bign)
+            operator = &DXOpe{
+                X:d1res,
+                Res:d2res,
+                ThreadNum:threadNum,
+                Rowx:bign,
+                Colx:1,
+                Srcx:srcx,
+                Srcy:srcy,
+            }
+            operator.Calculate()
+
+            W.SetCol(colidx,d2res)
+        }
+
     var ttt mat.Dense
-    ttt.Product(V.T(),d,d,V)
+    ttt.Product(V.T(),W)
     fmt.Printf("TV:\n%1.3f\n\n", mat.Formatted(&ttt))
 }

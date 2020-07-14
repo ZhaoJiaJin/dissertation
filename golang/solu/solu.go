@@ -101,7 +101,7 @@ func (sl *IteSolu)FindSolution()(*mat.VecDense){
         runtime.GC()
         alpha := r_k_norm / mat.Dot(p,q)
         x.AddScaledVec(x,alpha,p)
-        //if i % 2 == 0{
+        //if i % 5 == 0{
             r = vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
             runtime.GC()
         //}else{

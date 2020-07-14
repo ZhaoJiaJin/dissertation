@@ -98,7 +98,7 @@ func main(){
 	    log.Println("begin sylvester method")
             var res *mat.VecDense
             begin := time.Now().Unix()
-            res = solu.NewSylSolu(a,t,m,n,bigN,lvl,y,threadNum,1e-10)
+            res = solu.NewSylSolu(a,t,m,n,bigN,lvl,y,threadNum,1e-9)
             //res = sl.FindSolution()
             end := time.Now().Unix()
             log.Println("syl method time cost:",end - begin)
