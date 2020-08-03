@@ -3,7 +3,7 @@ package solu
 import(
     "gonum.org/v1/gonum/mat"
     "conjugate/utils"
-    "log"
+    //"log"
     //"runtime"
 )
 
@@ -89,13 +89,13 @@ func (sl *IteSolu)FindSolution(correct bool)(*mat.VecDense){
     //x = make([]float64,leng)
     r := vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
     //runtime.GC()
-    p := r
+    p := mat.VecDenseCopyOf(r)
 
     r_k_norm := mat.Dot(r,r)
     //ori_norm := r_k_norm
     q := new(mat.VecDense)
     for i:=1; i<2*leng; i ++{
-        log.Println("Begin Itr:", i, r_k_norm,correct)
+        //log.Println("Begin Itr:", i, r_k_norm,correct)
         q.Reset()
         q.AddVec(sl.calQx(p),sl.calBtCBx(p))
         //runtime.GC()

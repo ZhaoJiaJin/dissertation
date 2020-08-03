@@ -144,7 +144,7 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
         VH.Product(V,H)
         W.Sub(W,VH)
 
-        Vold = V
+        Vold = mat.DenseCopyOf(V)
         curB := new(mat.Dense)
         //fmt.Printf("W:\n%1.3f\n\n", mat.Formatted(W))
         V,curB = ReducedQR(W)
@@ -292,7 +292,7 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
         VH := new(mat.Dense)
         VH.Product(V,Hs[j-1])
         W.Sub(W,VH)
-        Vold = V
+        Vold = mat.DenseCopyOf(V)
         BInverse := new(mat.Dense)
         BInverse.Inverse(Bs[j-1])
         V.Product(W,BInverse)

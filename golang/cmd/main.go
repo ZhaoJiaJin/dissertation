@@ -29,8 +29,8 @@ func main(){
     flag.IntVar(&lvl, "lvl", 1, "level number")
     flag.IntVar(&m,"m",9,"value of m")
     flag.IntVar(&n,"n",4,"value of n")
-    flag.IntVar(&threadNum,"th",10,"the number of thread")
-    flag.StringVar(&method,"method","syl","use which method,  you can choose ite,std,and syl, and iteWoCorr")
+    flag.IntVar(&threadNum,"th",100,"the number of thread")
+    flag.StringVar(&method,"method","syl","use which method,  you can choose iteration,std,and syl, and iteWoCorr(iteration method without residual correction)")
     flag.StringVar(&yfile,"y","config/vectory","the vector y")
     flag.Parse()
 
@@ -66,14 +66,13 @@ func main(){
     basesl := solu.NewIteSolu(a,t,m,n,bigN,lvl,y,threadNum)
 
     for _,mtd := range methods{
-        if mtd == "ite" {
-            log.Println("begin iteration method")
+        if mtd == "iteration" {
             var res *mat.VecDense
             begin := time.Now().UnixNano()
             sl := solu.NewIteSolu(a,t,m,n,bigN,lvl,y,threadNum)
             res = sl.FindSolution(true)
             end := time.Now().UnixNano()
-            log.Println("iterate method time cost:",end - begin)
+            log.Println("iteration method time cost:",end - begin)
             allres[mtd] = res
             //log.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
             //stdsl.Validate(res)
@@ -81,22 +80,20 @@ func main(){
 	    log.Println("residual for iteration solution:",residual)
         }
         if mtd == "iteWoCorr" {
-            log.Println("begin iteration method")
             var res *mat.VecDense
             begin := time.Now().UnixNano()
             sl := solu.NewIteSolu(a,t,m,n,bigN,lvl,y,threadNum)
             res = sl.FindSolution(false)
             end := time.Now().UnixNano()
-            log.Println("iterate method without residual correction time cost:",end - begin)
+            log.Println("iteWoCorr time cost:",end - begin)
             allres[mtd] = res
             //log.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
             //stdsl.Validate(res)
 	    residual := basesl.CalR(res)
-	    log.Println("residual for iteration solution without residual correction:",residual)
+	    log.Println("residual for iteWoCorr:",residual)
         }
 
         if mtd == "std" {
-	    log.Println("begin standard method")
             var res *mat.VecDense
             begin := time.Now().UnixNano()
             sl := solu.NewStdSolu(a,t,m,n,bigN,lvl,y)
@@ -110,7 +107,6 @@ func main(){
 	    log.Println("residual for standard solution:",residual)
         }
         if mtd == "syl"{
-	    log.Println("begin sylvester method")
             var res *mat.VecDense
             begin := time.Now().UnixNano()
             res = solu.NewSylSolu(a,t,m,n,bigN,lvl,y,threadNum,1e-9)
