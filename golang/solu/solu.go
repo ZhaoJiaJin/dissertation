@@ -3,8 +3,8 @@ package solu
 import(
     "gonum.org/v1/gonum/mat"
     "conjugate/utils"
-    //"log"
-    "runtime"
+    "log"
+    //"runtime"
 )
 
 type IteSolu struct{
@@ -58,9 +58,9 @@ func (sl *IteSolu)calQx(x *mat.VecDense)mat.Vector{
     //res := x
     //X = mat.NewDense(sl.n, sl.N,raw).T()
     res = sl.DX(res)
-    runtime.GC()
+    //runtime.GC()
     res = sl.DX(res)
-    runtime.GC()
+    //runtime.GC()
     return mat.NewVecDense(len(res),res)
 }
 
@@ -74,38 +74,41 @@ func (sl *IteSolu)calBtCBx(x *mat.VecDense)mat.Vector{
 
 func (sl *IteSolu)CalR(x *mat.VecDense)float64{
     b := sl.calb()
-    runtime.GC()
+    //runtime.GC()
     r := vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
     return mat.Dot(r,r)
 }
 
-func (sl *IteSolu)FindSolution()(*mat.VecDense){
+func (sl *IteSolu)FindSolution(correct bool)(*mat.VecDense){
     b := sl.calb()
-    runtime.GC()
+    //runtime.GC()
 
     leng,_ := b.Dims()
     x := mat.NewVecDense(leng, nil)
 
     //x = make([]float64,leng)
     r := vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
-    runtime.GC()
+    //runtime.GC()
     p := r
 
     r_k_norm := mat.Dot(r,r)
     //ori_norm := r_k_norm
     q := new(mat.VecDense)
     for i:=1; i<2*leng; i ++{
-        //log.Println("Begin Itr:", i)
+        log.Println("Begin Itr:", i, r_k_norm,correct)
         q.Reset()
         q.AddVec(sl.calQx(p),sl.calBtCBx(p))
-        runtime.GC()
+        //runtime.GC()
         alpha := r_k_norm / mat.Dot(p,q)
         x.AddScaledVec(x,alpha,p)
         //if i % 5 == 0{
+	if correct{
             r = vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
-            runtime.GC()
+    	}else{
+            r.AddScaledVec(r, alpha*-1, q)
+	}
+            //runtime.GC()
         //}else{
-        //    r.AddScaledVec(r, alpha*-1, q)
         //}
 
         r_k1_norm := mat.Dot(r,r)
@@ -113,7 +116,7 @@ func (sl *IteSolu)FindSolution()(*mat.VecDense){
         r_k_norm = r_k1_norm
         if r_k1_norm < 1e-5{
             //r = vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
-            runtime.GC()
+            //runtime.GC()
             //log.Println("Itr:", i, r_k1_norm, mat.Dot(r,r),ori_norm)
             break
         }
