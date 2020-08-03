@@ -3,7 +3,7 @@ package solu
 import(
     "gonum.org/v1/gonum/mat"
     "conjugate/utils"
-    "log"
+    //"log"
     "runtime"
 )
 
@@ -92,7 +92,7 @@ func (sl *IteSolu)FindSolution()(*mat.VecDense){
     p := r
 
     r_k_norm := mat.Dot(r,r)
-    ori_norm := r_k_norm
+    //ori_norm := r_k_norm
     q := new(mat.VecDense)
     for i:=1; i<2*leng; i ++{
         //log.Println("Begin Itr:", i)
@@ -112,9 +112,9 @@ func (sl *IteSolu)FindSolution()(*mat.VecDense){
         beta := r_k1_norm/r_k_norm
         r_k_norm = r_k1_norm
         if r_k1_norm < 1e-5{
-            r = vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
+            //r = vectorsub(b, sl.calQx(x), sl.calBtCBx(x))
             runtime.GC()
-            log.Println("Itr:", i, r_k1_norm, mat.Dot(r,r),ori_norm)
+            //log.Println("Itr:", i, r_k1_norm, mat.Dot(r,r),ori_norm)
             break
         }
         p.AddScaledVec(r,beta,p)

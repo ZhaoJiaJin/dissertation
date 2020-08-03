@@ -78,7 +78,7 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
     r := B0norm
     //for math.Sqrt(r) > epsilon * B0norm{
     for oldr > r{
-        fmt.Println("Ite:",i)
+        //fmt.Println("Ite:",i)
         i ++
         // Lanczos steps
         W := mat.NewDense(bign,n,nil)
@@ -134,7 +134,7 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
 
         if i > 1{
             var VoldB mat.Dense
-            VoldB.Product(Vold,Bs[len(Bs)-1])
+            VoldB.Product(Vold,Bs[i-2])
             W.Sub(W,&VoldB)
         }
         H := new(mat.Dense)
@@ -216,7 +216,7 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
             }
             r += deltaV.At(0,0)
         }
-        fmt.Println("new residual",r)
+        //fmt.Println("new residual",r)
 
     }
     E1 := GetEi(0, i, n)

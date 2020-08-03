@@ -69,10 +69,10 @@ func main(){
         if mtd == "ite" {
             log.Println("begin iteration method")
             var res *mat.VecDense
-            begin := time.Now().Unix()
+            begin := time.Now().UnixNano()
             sl := solu.NewIteSolu(a,t,m,n,bigN,lvl,y,threadNum)
             res = sl.FindSolution()
-            end := time.Now().Unix()
+            end := time.Now().UnixNano()
             log.Println("iterate method time cost:",end - begin)
             allres[mtd] = res
             //log.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
@@ -83,10 +83,10 @@ func main(){
         if mtd == "std" {
 	    log.Println("begin standard method")
             var res *mat.VecDense
-            begin := time.Now().Unix()
+            begin := time.Now().UnixNano()
             sl := solu.NewStdSolu(a,t,m,n,bigN,lvl,y)
             res = sl.FindSolution()
-            end := time.Now().Unix()
+            end := time.Now().UnixNano()
             log.Println("standard method time cost:",end - begin)
             allres[mtd] = res
             //log.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
@@ -97,10 +97,10 @@ func main(){
         if mtd == "syl"{
 	    log.Println("begin sylvester method")
             var res *mat.VecDense
-            begin := time.Now().Unix()
+            begin := time.Now().UnixNano()
             res = solu.NewSylSolu(a,t,m,n,bigN,lvl,y,threadNum,1e-9)
             //res = sl.FindSolution()
-            end := time.Now().Unix()
+            end := time.Now().UnixNano()
             log.Println("syl method time cost:",end - begin)
             allres[mtd] = res
             //log.Printf("res:\n%1.3f\n\n", mat.Formatted(res.T()))
@@ -109,7 +109,7 @@ func main(){
 	    log.Println("residual for sylvester solution:",residual)
         }
     }
-    for idx1 := 0; idx1 < len(methods); idx1 ++{
+    /*for idx1 := 0; idx1 < len(methods); idx1 ++{
         for idx2 := idx1+1; idx2 < len(methods); idx2 ++{
             k1 := methods[idx1]
             k2 := methods[idx2]
@@ -119,5 +119,5 @@ func main(){
             distance.SubVec(tmpres1,tmpres2)
             log.Printf("Distance between %s and %s is %v\n",k1,k2,mat.Dot(distance,distance))
         }
-    }
+    }*/
 }
