@@ -26,11 +26,11 @@ var(
 func main(){
     flag.StringVar(&afile, "afile", "config/a.csv", "matrix A config file")
     flag.StringVar(&tfile, "tfile", "config/t.csv", "matrix T config file")
-    flag.IntVar(&lvl, "lvl", 1, "level number")
+    flag.IntVar(&lvl, "lvl", 1, "level number, Nside = pow(2,lvl)")
     flag.IntVar(&m,"m",9,"value of m")
     flag.IntVar(&n,"n",4,"value of n")
     flag.IntVar(&threadNum,"th",100,"the number of thread")
-    flag.StringVar(&method,"method","syl","use which method,  you can choose iteration,std,and syl, and iteWoCorr(iteration method without residual correction)")
+    flag.StringVar(&method,"method","syl","use which method,  you can choose iteration(conjugate gradient),std(standard),and syl(Sylvester equation), and iteWoCorr(conjugate gradient method without residual correction)")
     flag.StringVar(&yfile,"y","config/vectory","the vector y")
     flag.Parse()
 
