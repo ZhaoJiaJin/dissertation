@@ -112,25 +112,6 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
 
             W.SetCol(colidx,d2res)
         }
-        /*d := generateD(lvl)
-
-        //fmt.Printf("d:\n%1.1f\n\n", mat.Formatted(d))
-        x1,x2 := d.Dims()
-        if x1 != x2{
-            fmt.Println("len",x1,x2)
-            panic("not sym")
-        }
-        for i1 := 0; i1 < x1; i1 ++{
-            for i2:=0; i2 < x2; i2++{
-                if d.At(i1,i2) != d.At(i2,i1){
-                    fmt.Println("pos",i1,i2,d.At(i1,i2),d.At(i2,i1))
-                    panic("not sym")
-                }
-            }
-        }
-        d2 := new(mat.Dense)
-        d2.Product(d,d)
-        W.Product(d2,V)*/
 
         if i > 1{
             var VoldB mat.Dense
@@ -148,8 +129,6 @@ func NewSylSolu(a,t mat.Matrix,m,n,bign,lvl int, y []float64, threadNum int, eps
         curB := new(mat.Dense)
         //fmt.Printf("W:\n%1.3f\n\n", mat.Formatted(W))
         V,curB = ReducedQR(W)
-        //fmt.Printf("New V:\n%1.3f\n\n", mat.Formatted(V))
-        //fmt.Printf("New V:\n%1.3f\n\n", mat.Formatted(V))
         Bs = append(Bs, curB)
         //fullV = addv(fullV,V)
         //fmt.Printf("New Full V:\n%1.3f\n\n", mat.Formatted(fullV))
